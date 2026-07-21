@@ -90,14 +90,14 @@ class SubCategory(models.Model):
         return self.subcategory_name
 
 
-class product(models.Model):
+class Product(models.Model):
     prod_id = models.AutoField
     prod_name = models.CharField(max_length=50)
     section_id = models.ForeignKey(Section, default="", on_delete=models.CASCADE)
     category_id = models.ForeignKey(Category, default=1, on_delete=models.CASCADE)
     subcategory_id = models.ForeignKey(SubCategory, default=1, on_delete=models.CASCADE)
     prod_desc = models.CharField(max_length=300)
-    price = models.IntegerField(default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     pub_date = models.DateField()
     prod_stock = models.IntegerField(default=0)
     image = models.ImageField(upload_to='shop/images', default="")
@@ -138,7 +138,7 @@ class Order(models.Model):
     order_id = models.AutoField(primary_key=True)
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="orders")
     order_quantity = models.PositiveIntegerField(default=0)
-    order_total = models.IntegerField(default=0)
+    order_total = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     order_date = models.DateField(auto_now_add=True)
     delivery_status = models.BooleanField(default=False)
     
@@ -168,7 +168,7 @@ class Order(models.Model):
 
 class OrderItem(models.Model):
     order_id = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
-    prod = models.ForeignKey(product, on_delete=models.CASCADE)
+    prod = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(default=1)
     track_id = models.OneToOneField(Track, on_delete=models.CASCADE, null=False)
 
@@ -198,8 +198,8 @@ class Cart(models.Model):
 
 class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    prod = models.ForeignKey(product, on_delete=models.CASCADE)
-    quantity = models.IntegerField(default=1)
+    prod = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
 
     @property
     def item_total(self):
@@ -209,7 +209,7 @@ class CartItem(models.Model):
 class Address(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, related_name="address")
     name = models.CharField(max_length=40, null=False)
-    contact = models.PositiveIntegerField(validators=[MinValueValidator(6000000000), MaxValueValidator(9999999999)], null=False)
+    contact = models.CharField(max_length=15, null=False)
     ship_to = models.CharField(max_length=150, null=False)
     pincode = models.PositiveIntegerField(validators=[MinValueValidator(100000), MaxValueValidator(999999)])
     city = models.CharField(max_length=30, null=False)
@@ -238,7 +238,7 @@ class Payment(models.Model):
     gateway_signature = models.CharField(max_length=200, null=True, blank=True)
     
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
-    amount = models.IntegerField(default=0)
+    amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     currency = models.CharField(max_length=10, default='INR')
     
     # We use timezone.now as default or auto_now_add
@@ -280,4 +280,4 @@ class Wishlist(models.Model):
 
 class wishItems(models.Model):
     wishlist = models.ForeignKey(Wishlist, on_delete=models.CASCADE, related_name="items")
-    prod = models.ForeignKey(product, on_delete=models.CASCADE)
+    prod = models.ForeignKey(Product, on_delete=models.CASCADE)

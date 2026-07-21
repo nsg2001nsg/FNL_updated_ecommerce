@@ -182,7 +182,15 @@
                     </div>
                 </div>
             </div>{% endif %}
-            {% endfor %}{% endfor %}
+            {% endfor %}
+            {% empty %}
+            <div class="text-center py-5 d-flex flex-column align-items-center justify-content-center" style="min-height: 50vh;">
+                <i class="fa fa-box-open mb-4" style="font-size: 4rem; color: #e0e0e0;"></i>
+                <h2 class="mb-3" style="color:#646464; font-family: 'Anton', sans-serif;">No orders yet</h2>
+                <p class="text-muted mb-4" style="font-size: 1.1rem; font-family: sans-serif;">Looks like you haven't placed any orders yet.</p>
+                <a href="{% url 'index' %}" class="btn px-4 py-2" style="border: 2px solid pink; color: #FF647F; font-family: 'Anton', sans-serif; background: transparent; transition: 0.3s;" onmouseover="this.style.backgroundColor='pink'; this.style.color='white';" onmouseout="this.style.backgroundColor='transparent'; this.style.color='#FF647F';">CONTINUE SHOPPING</a>
+            </div>
+            {% endfor %}
         </div>
         <div class="col-md-3"></div>
     </div>

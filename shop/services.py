@@ -1,5 +1,5 @@
 from django.db import transaction
-from .models import Order, Payment, OrderItem, Track, CartItem, Cart, product
+from .models import Order, Payment, OrderItem, Track, CartItem, Cart, Product
 import logging
 
 logger = logging.getLogger(__name__)
@@ -63,7 +63,7 @@ def process_checkout(customer, cart_obj, is_online_payment, rzp_order_id=None, r
             # 5. Lock Inventory & Reduce Stock
             for item in cart.items.all():
                 # Lock product row
-                prod = product.objects.select_for_update().get(id=item.prod_id)
+                prod = Product.objects.select_for_update().get(id=item.prod_id)
                 if prod.prod_stock < item.quantity:
                     logger.warning(f"Stock Update Failed: Insufficient stock for {prod.prod_name}.")
                     raise InsufficientStockException(f"Insufficient stock for {prod.prod_name}")

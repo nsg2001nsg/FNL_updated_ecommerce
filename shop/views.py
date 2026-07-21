@@ -31,7 +31,7 @@ def menu(request, myid):
         categor = Category.objects.get(category_id=myid)
         category = 0
         cat = categor
-    prods = product.objects.filter(Q(subcategory_id=category) | Q(category_id=categor)).order_by('id')
+    prods = Product.objects.filter(Q(subcategory_id=category) | Q(category_id=categor)).order_by('id')
     
     paginator = Paginator(prods, settings.PRODUCTS_PER_PAGE)
     page_number = request.GET.get('page')
@@ -50,7 +50,7 @@ def Bag(request):
 
 
 def index(request):
-    bestseller = product.objects.all().order_by('-id')[:12]
+    bestseller = Product.objects.all().order_by('-id')[:12]
     param = {'bestseller': bestseller}
     if request.user.is_authenticated:
         wishlisted_ids = wishItems.objects.filter(wishlist__customer=request.user).values_list('prod_id', flat=True)
@@ -75,7 +75,7 @@ def search(request):
             Q(subcategory_id__subcategory_name__icontains=keyword) |
             Q(section_id__section_name__icontains=keyword)
         )
-    prods = product.objects.filter(q).order_by('id')
+    prods = Product.objects.filter(q).order_by('id')
     paginator = Paginator(prods, settings.PRODUCTS_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -89,7 +89,7 @@ def search(request):
 
 
 def prodview(request, myid):
-    prod = product.objects.filter(id=myid).first()
+    prod = Product.objects.filter(id=myid).first()
     params = {'prod': prod}
     if request.user.is_authenticated:
         customer = request.user
@@ -226,7 +226,7 @@ def add_to_cart(request):
         customer = request.user
         cart_obj = Cart.objects.get(customer=customer)
         product_id = request.POST['product_id']
-        prod = product.objects.get(id=product_id)
+        prod = Product.objects.get(id=product_id)
         # add the product to the cart
         cart_item = CartItem.objects.create(cart=cart_obj, prod=prod)
         cart_item.save()
@@ -240,7 +240,7 @@ def add_to_wish(request):
         customer = request.user
         wish_obj = Wishlist.objects.get(customer=customer)
         product_id = request.POST['product_id']
-        prod = product.objects.get(id=product_id)
+        prod = Product.objects.get(id=product_id)
         # add the product to the cart
         wish_item = wishItems.objects.create(wishlist=wish_obj, prod=prod)
         wish_item.save()
@@ -264,7 +264,7 @@ def cancel_order_item(request):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == 'POST':
-        prod = product.objects.get(id=request.POST['cancel_item'])
+        prod = Product.objects.get(id=request.POST['cancel_item'])
         order_obj = Order.objects.get(order_id=request.POST['order_id'])
         item_obj = OrderItem.objects.get(order_id=order_obj, prod=prod)
         track_item = Track.objects.get(track_id=item_obj.track_id.track_id)

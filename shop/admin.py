@@ -41,7 +41,7 @@ class SubCategoryAdmin(admin.ModelAdmin):
     list_select_related = ('category_id',)
     autocomplete_fields = ('category_id',)
 
-@admin.register(product)
+@admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
     list_display = ('prod_name', 'category_id', 'price', 'prod_stock', 'pub_date')
     list_filter = ('category_id', 'subcategory_id', 'section_id')

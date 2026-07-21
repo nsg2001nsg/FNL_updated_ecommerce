@@ -19,17 +19,23 @@
                 </div>
             </div>
         {% else %}
-             <div class="container" style="margin:auto; text-align:start;">
-            <img src="{% static 'shop/empty_bag.jpg' %}" style="position:relative; left:350px;">
-            <h3 style="position:relative; color:#646464; left:440px; top:-600px; font-family:Anton; color:#FF647F;">You Don't Have Any Favourites Yet!</h3>
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center py-5">
+                <img src="{% static 'shop/empty_bag.jpg' %}" class="img-fluid mb-4" style="max-height: 200px;" alt="Empty Wishlist">
+                <h3 style="font-family:Anton; color:#FF647F;">You Don't Have Any Favourites Yet!</h3>
+                <a href="{% url 'index' %}" class="btn btn-primary mt-3" style="background-color: #FF647F; border:0;">Continue Shopping</a>
+            </div>
         </div>
         {% endif %}
     {% else %}
-    <h5 style="color:#646464; font-family:Anton;">You need to be logged in so that we're able to keep track of your favourites!</h5>
-    <div class="col-md-8">
-        <button class="btn" onmouseover="this.style.border='2px solid #FF647F';" onmouseout="this.style.border='1px solid #FF647F';"
-                onclick="window.location.href='/signup/';" style="background-color:transparent; border:1px solid #FF647F; width:400px; position:relative; left:250px; top:100px;"><h2 style="position:relative; color:#FF647F; font-family:Anton;">Login to proceed</h2>
-              <i class="fa fa-user-circle fa-2x" style="color:#FF647F;"></i></button></div>
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center py-5">
+            <img src="{% static 'shop/empty_bag.jpg' %}" class="img-fluid mb-4" style="max-height: 200px;" alt="Empty Wishlist">
+            <h3 style="font-family:Anton; color:#FF647F;">You Don't Have Any Favourites Yet!</h3>
+            <h5 class="text-muted mt-3">Login to view your favourites or start shopping</h5>
+            <a href="{% url 'signup' %}" class="btn btn-primary mt-3" style="background-color: #FF647F; border:0;">Login / Signup</a>
+        </div>
+    </div>
     {% endif %}
 </div>
 {% endblock %}
