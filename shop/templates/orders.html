@@ -1,0 +1,191 @@
+{% extends "basic.html" %}
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/fontawesome.min.css"></script>
+{% endblock %}
+{% block title %}Orders{% endblock %}
+<!--   navbar ends here-->
+{% block css %}
+<style>
+</style>
+{% endblock %}
+{% block body %}
+{% load static %}
+<div style="text-align:center; overflow:hidden; font-family:Anton;">
+    <div class="row my-2">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6" style="background-color:#E2E5DE; color:#646464; text-align:start; height:50px; padding:12px; border-radius:5px 0px 0px 5px;">Account: {{ customer.default_ship.name }}</div>
+                <div class="col-md-6" style="background-color:#E2E5DE; color:#646464; height:50px; padding:12px; border-radius:0px 5px 5px 0px; text-align:start;"><h5>All Orders</h5></div>
+            </div>
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-3"></div>
+        <div class="col-md-6">
+            {% for order in ORDER %}{% for item in order.order_items.all %}{% if item.track_id.item_code == 1 %}
+            <div class="card my-3" style="background-color:#fff8f9; height:250px; width:100%; box-shadow: 2px 2px 0px 0px pink; border:0; padding: 0px 5px;">
+                <div class="row"><div class="col-md-3"><img src="{{ item.prod.image.url }}"
+                                                            style="border-radius: 5px; height:220px; width:170px; position:relative; left:10px; top:10px; border:1px solid #ffe9ec;"></div>
+                    <div class="col-md-9" style="color:#646464;">
+                        <div class="row">
+                            <div class="col-md-6" style="text-align:start;"> <b style="position:relative; top:10px; color:#FF647F;"><i class="fa fa-clipboard"></i> Order {{ item.track_id.status }}</b></div>
+                            <div class="col-md-6" style="text-align:end;"> <b style="position:relative; top:10px;">Arriving by {{ order.delivery_date }}</b></div>
+                        </div><hr>
+                        <div style="text-align:start;"><b>{{item.prod}}</b><br>
+                        <p>Quantity {{item.quantity}}</p>
+                            <b>Rs. {{item.item_total}}</b><br>
+                            <b>Payment:{% if order.get_payment_status %} Card {% else %} Cash On Delivery {% endif %}</b>
+                        </div>
+                        <hr>
+                            <button class="btn" data-bs-toggle="modal" data-bs-target="#confirm-modal{{item.id}}" style="background-color: transparent; border: 1px solid pink; width:150px;"
+                                    onmouseover="this.style.border='2px solid pink'; this.style.color='#FF647F';" onmouseout="this.style.border='1px solid pink'; this.style.color='#646464';">Cancel</button>
+                        <button class="btn" data-bs-toggle="modal" data-bs-target="#track-modal{{item.id}}" style="background-color: transparent; border: 1px solid pink; width:150px;"
+                                    onmouseover="this.style.border='2px solid pink'; this.style.color='#FF647F';" onmouseout="this.style.border='1px solid pink'; this.style.color='#646464';">Track</button>
+                        
+                        <!-- confirmation modal -->
+                        <div class="modal fade" id="confirm-modal{{item.id}}" tabindex="-1" aria-hidden="true" style="font-family: Arial, sans-serif;">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header border-0">
+                                        <h5 class="modal-title">Cancel {{item.quantity}} {{item.prod}}?</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body text-center pb-4">
+                                        <form action="{% url 'cancel_order_item' %}" method="POST">{% csrf_token %}
+                                            <input type="hidden" value="{{item.prod.id}}" name="cancel_item">
+                                            <input type="hidden" value="{{item.order_id.order_id}}" name="order_id">
+                                            <button class="btn w-100 py-3 fw-bold" type="submit" style="border: 2px solid #FF647F; color: #FF647F; background: transparent;">REQUEST CANCELLATION</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- tracking modal -->
+                        <div class="modal fade" id="track-modal{{item.id}}" tabindex="-1" aria-hidden="true" style="font-family: Arial, sans-serif;">
+                            <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                <div class="modal-content text-start">
+                                    <div class="modal-header border-0 pb-0">
+                                        <h5 class="modal-title">Tracker <br><small class="text-muted fs-6">ID: {{item.track_id.track_id}}</small></h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body px-4 pb-4 pt-4">
+                                        <ul class="list-unstyled" style="margin-left: 20px;">
+                                            <li class="position-relative" style="padding-bottom: 30px;">
+                                                <i id="deliver-i{{item.id}}" class="fa fa-home fa-lg position-absolute bg-white" style="left: -20px; top: 0; color: #646464; z-index: 2;"></i>
+                                                <div class="ms-3 fw-bold text-secondary">Delivered</div>
+                                                <div id="deliver-h{{item.id}}" class="position-absolute" style="left: -12px; top: 15px; bottom: 0; border-left: 3px solid #646464; z-index: 1;"></div>
+                                            </li>
+                                            <li class="position-relative" style="padding-bottom: 30px;">
+                                                <i id="out-i{{item.id}}" class="fa fa-exchange fa-lg position-absolute bg-white" style="left: -20px; top: 0; color: #646464; z-index: 2;"></i>
+                                                <div class="ms-3 fw-bold text-secondary">Out For Delivery</div>
+                                                <div id="out-h{{item.id}}" class="position-absolute" style="left: -12px; top: 15px; bottom: 0; border-left: 3px solid #646464; z-index: 1;"></div>
+                                            </li>
+                                            <li class="position-relative" style="padding-bottom: 30px;">
+                                                <i id="transit-i{{item.id}}" class="fa fa-motorcycle fa-lg position-absolute bg-white" style="left: -20px; top: 0; color: #646464; z-index: 2;"></i>
+                                                <div class="ms-3 fw-bold text-secondary">In Transit</div>
+                                                <div id="transit-h{{item.id}}" class="position-absolute" style="left: -12px; top: 15px; bottom: 0; border-left: 3px solid #646464; z-index: 1;"></div>
+                                            </li>
+                                            <li class="position-relative" style="padding-bottom: 30px;">
+                                                <i id="ship-i{{item.id}}" class="fa fa-truck fa-lg position-absolute bg-white" style="left: -20px; top: 0; color: #646464; z-index: 2;"></i>
+                                                <div class="ms-3 fw-bold text-secondary">Shipped</div>
+                                                <div id="ship-h{{item.id}}" class="position-absolute" style="left: -12px; top: 15px; bottom: 0; border-left: 3px solid #646464; z-index: 1;"></div>
+                                            </li>
+                                            <li class="position-relative" style="padding-bottom: 30px;">
+                                                <i id="dispatch-i{{item.id}}" class="fa fa-bandcamp fa-lg position-absolute bg-white" style="left: -20px; top: 0; color: #646464; z-index: 2;"></i>
+                                                <div class="ms-3 fw-bold text-secondary">Dispatched To Delivery Center</div>
+                                                <div id="dispatch-h{{item.id}}" class="position-absolute" style="left: -12px; top: 15px; bottom: 0; border-left: 3px solid #646464; z-index: 1;"></div>
+                                            </li>
+                                            <li class="position-relative" style="padding-bottom: 30px;">
+                                                <i id="pack-i{{item.id}}" class="fa fa-cube fa-lg position-absolute bg-white" style="left: -20px; top: 0; color: #646464; z-index: 2;"></i>
+                                                <div class="ms-3 fw-bold text-secondary">Packed</div>
+                                                <div id="pack-h{{item.id}}" class="position-absolute" style="left: -12px; top: 15px; bottom: 0; border-left: 3px solid #646464; z-index: 1;"></div>
+                                            </li>
+                                            <li class="position-relative">
+                                                <i class="fa fa-check-circle fa-lg position-absolute bg-white" style="left: -20px; top: 0; color: #FF647F; z-index: 2;"></i>
+                                                <div class="ms-3 fw-bold" style="color: #FF647F;">Confirmed</div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <script>
+                            {% if item.track_id.status == 'packed' %} 
+                                document.getElementById('pack-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('pack-i{{item.id}}').style.color="pink";
+                            {% elif item.track_id.status == 'dispatched' %}
+                                document.getElementById('pack-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('pack-i{{item.id}}').style.color="pink";
+                                document.getElementById('dispatch-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('dispatch-i{{item.id}}').style.color="pink";
+                            {% elif item.track_id.status == 'shipped' %}
+                                document.getElementById('pack-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('pack-i{{item.id}}').style.color="pink";
+                                document.getElementById('dispatch-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('dispatch-i{{item.id}}').style.color="pink";
+                                document.getElementById('ship-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('ship-i{{item.id}}').style.color="pink";
+                            {% elif item.track_id.status == 'in-transit' %}
+                                document.getElementById('pack-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('pack-i{{item.id}}').style.color="pink";
+                                document.getElementById('dispatch-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('dispatch-i{{item.id}}').style.color="pink";
+                                document.getElementById('ship-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('ship-i{{item.id}}').style.color="pink";
+                                document.getElementById('transit-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('transit-i{{item.id}}').style.color="pink";
+                            {% elif item.track_id.status == 'out for delivery' %}
+                                document.getElementById('pack-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('pack-i{{item.id}}').style.color="pink";
+                                document.getElementById('dispatch-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('dispatch-i{{item.id}}').style.color="pink";
+                                document.getElementById('ship-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('ship-i{{item.id}}').style.color="pink";
+                                document.getElementById('transit-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('transit-i{{item.id}}').style.color="pink";
+                                document.getElementById('out-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('out-i{{item.id}}').style.color="pink";
+                            {% elif item.track_id.status == 'delivered' %}
+                                document.getElementById('pack-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('pack-i{{item.id}}').style.color="pink";
+                                document.getElementById('dispatch-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('dispatch-i{{item.id}}').style.color="pink";
+                                document.getElementById('ship-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('ship-i{{item.id}}').style.color="pink";
+                                document.getElementById('transit-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('transit-i{{item.id}}').style.color="pink";
+                                document.getElementById('out-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('out-i{{item.id}}').style.color="pink";
+                                document.getElementById('deliver-h{{item.id}}').style.borderLeft="3px solid pink"; document.getElementById('deliver-i{{item.id}}').style.color="pink";
+                            {% endif %}
+                        </script>
+                    </div>
+                </div>
+            </div>{% endif %}
+            {% endfor %}
+            {% for item in order.order_items.all %}{% if item.track_id.item_code == 2 %}
+            <div class="card my-3" style="background-color:#f5fff5; height:250px; width:100%; box-shadow: 2px 2px 0px 0px #BDF5BD; border:0; padding: 0px 5px;">
+                <div class="row"><div class="col-md-3"><img src="{{ item.prod.image.url }}"
+                                                            style="border-radius: 5px; height:220px; width:170px; position:relative; left:10px; top:10px; border:1px solid #ffe9ec;"></div>
+                    <div class="col-md-9" style="color:#646464;">
+                        <div class="row">
+                            <div class="col-md-6" style="text-align:start;"> <b style="position:relative; top:10px; color:#90EE90;"><i class="fa fa-check-circle fa-lg"></i> Order {{ item.track_id.status }}</b></div>
+                            <div class="col-md-6" style="text-align:end;"> <b style="position:relative; color:#90EE90; top:10px;">Delivered on {{ order.delivery_date }}</b></div>
+                        </div><hr>
+                        <div style="text-align:start;"><b>{{item.prod}}</b><br>
+                        <p>Quantity {{item.quantity}}</p>
+                            <b>Rs. {{item.item_total}}</b><br></div>
+                        <br>
+                    </div>
+                </div>
+            </div>{% endif %}
+            {% endfor %}
+            {% for item in order.order_items.all %}{% if item.track_id.item_code == 0 %}
+            <div class="card my-3" style="background-color:#ececec; height:250px; width:100%; box-shadow: 2px 2px 0px 0px #babcbb; border:0; padding: 0px 5px;">
+                <div class="row"><div class="col-md-3"><img src="{{ item.prod.image.url }}"
+                                                            style="border-radius: 5px; height:220px; width:170px; position:relative; left:10px; top:10px; border:1px solid #ffe9ec;"></div>
+                    <div class="col-md-9" style="color:#646464;">
+                        <div class="row">
+                            <div class="col-md-6" style="text-align:start;"> <b style="position:relative; top:10px; color:#646464;"><i class="fa fa-times-circle" style="font-size:23px; position:relative; top:3px;"></i> Order {{ item.track_id.status }}</b></div>
+                            <div class="col-md-6" style="text-align:end;"> <b style="position:relative; top:10px; color:#646464;"> Cancelled as per your request</b></div>
+                        </div><hr>
+                        <div style="text-align:start;"><b>{{item.prod}}</b><br>
+                        <p>Quantity {{item.quantity}}</p>
+                            <b>Rs. {{item.item_total}}</b><br>
+                            <b>{% if order.get_payment_status %} Refund Processed  {% else %} Refund None {% endif %}</b>
+                        </div>
+                        <br>
+                    </div>
+                </div>
+            </div>{% endif %}
+            {% endfor %}{% endfor %}
+        </div>
+        <div class="col-md-3"></div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}{% endblock %}

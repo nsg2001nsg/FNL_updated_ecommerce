@@ -1,0 +1,36 @@
+{% extends "basic.html" %}
+{% load static %}
+{% block title %}Wishlist{% endblock %}
+<!--   navbar ends here-->
+{% block body %}
+<div style="font-family:Anton; text-align:center;">
+    {% if request.user.is_authenticated %}
+        {% if wish.items.all %}
+            <div class="container my-4">
+                <h4>FAVOURITES</h4>
+                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4 text-start mt-4">
+                    {% for item in wish.items.all %}
+                    <div class="col">
+                        {% with is_wishlist_page=True prod=item.prod item_id=item.id %}
+                            {% include 'includes/product_card.html' %}
+                        {% endwith %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% else %}
+             <div class="container" style="margin:auto; text-align:start;">
+            <img src="{% static 'shop/empty_bag.jpg' %}" style="position:relative; left:350px;">
+            <h3 style="position:relative; color:#646464; left:440px; top:-600px; font-family:Anton; color:#FF647F;">You Don't Have Any Favourites Yet!</h3>
+        </div>
+        {% endif %}
+    {% else %}
+    <h5 style="color:#646464; font-family:Anton;">You need to be logged in so that we're able to keep track of your favourites!</h5>
+    <div class="col-md-8">
+        <button class="btn" onmouseover="this.style.border='2px solid #FF647F';" onmouseout="this.style.border='1px solid #FF647F';"
+                onclick="window.location.href='/signup/';" style="background-color:transparent; border:1px solid #FF647F; width:400px; position:relative; left:250px; top:100px;"><h2 style="position:relative; color:#FF647F; font-family:Anton;">Login to proceed</h2>
+              <i class="fa fa-user-circle fa-2x" style="color:#FF647F;"></i></button></div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block js %}{% endblock %}

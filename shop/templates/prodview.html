@@ -1,0 +1,121 @@
+{% extends "basic.html" %}
+{% block title %}{{prod.prod_name}}-F&L{% endblock %}
+<!--   navbar ends here-->
+{% block css %}
+{% endblock %}
+{% block body %}
+<div class="container my-5">
+    <div class="row g-4">
+        <div class="col-md-5 col-lg-4 text-center">
+            <img src="{{prod.image.url}}" class="img-fluid rounded shadow-sm" alt="{{prod.prod_name}}" style="max-height: 500px; object-fit: cover;">
+        </div>
+        <div class="col-md-7 col-lg-8">
+            <h3 class="card-title" style="font-family:Anton;">{{prod.prod_name}}</h3>
+            <h5 class="text-muted" style="font-family:Anton;">{{prod.prod_desc}}</h5>
+            <br>
+            <h3 style="font-family:Anton;">Rs. {{prod.price}}</h3>
+            <small class="text-success">inclusive of all taxes</small>
+            <hr class="text-danger my-4">
+            <h5 style="font-family:Anton;">Select Size</h5>
+            <div class="d-inline-block border border-dark rounded-pill px-3 py-2 mb-4" style="color:#646464;">
+                <b>ONE SIZE</b>
+            </div>
+            
+            <div class="d-flex flex-wrap gap-3 mb-4">
+                <div id="div_bag" class="flex-grow-1" style="max-width: 300px;">
+                    {% if is_present %}
+                    <a href="/Bag" class="text-decoration-none">
+                        <button id="pr{{prod.id}}" class="btn w-100 d-flex align-items-center justify-content-center gap-2" type="button" style="height:50px; background-color: #FF647F; border-color:#FF92A5; color:white; transition: opacity 0.2s;" onmouseover="this.style.opacity = '0.8';" onmouseout="this.style.opacity = '1';">
+                            <i class="fa fa-shopping-bag fa-lg" aria-hidden="true"></i> GO TO BAG
+                        </button>
+                    </a>
+                    {% else %}
+                    <button id="pr{{prod.id}}" class="btn w-100 cart d-flex align-items-center justify-content-center gap-2" type="button" style="height:50px; background-color: #FF647F; border-color:#FF92A5; color:white; transition: opacity 0.2s;" onmouseover="this.style.opacity = '0.8';" onmouseout="this.style.opacity = '1';">
+                        <i class="fa fa-shopping-bag fa-lg" aria-hidden="true"></i> ADD TO BAG
+                    </button>
+                    {% endif %}
+                </div>
+                
+                <div id="div_wish" class="flex-grow-1" style="max-width: 300px;">
+                    {% if w_present %}
+                    <a href="/wishlist" class="text-decoration-none">
+                        <button id="wl{{prod.id}}" class="btn w-100 d-flex align-items-center justify-content-center gap-2" type="button" style="height:50px; border:1px solid #FF92A5; background-color: transparent; color:#FF647F; transition: all 0.2s;">
+                            <i id="wlicon" class="fa fa-heart fa-lg" aria-hidden="true" style="color:#FF647F;"></i> WISHLISTED
+                        </button>
+                    </a>
+                    {% else %}
+                    <button id="wl{{prod.id}}" class="btn w-100 wishlist d-flex align-items-center justify-content-center gap-2" type="button" style="height:50px; border:1px solid gray; background-color: transparent; color:black; transition: all 0.2s;" onmouseover="this.style.borderColor='black'; this.querySelector('i').style.color='black';" onmouseout="this.style.borderColor='gray'; this.querySelector('i').style.color='gray';">
+                        <i id="wlicon" class="fa fa-heart-o fa-lg" aria-hidden="true" style="color:gray;"></i> WISHLIST
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+            <hr class="text-danger my-4">
+            <h5 style="font-family: Anton;">Product Details <i class="fa fa-file-o ms-2" aria-hidden="true"></i></h5>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+{% if CART.total_item > 0 %}
+        document.getElementById('cart').innerHTML = {{CART.total_item}};
+{% endif %}
+</script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% if user.is_authenticated %}
+<script>
+$('.cart').click(function(){
+let my_id = {{prod.id}};
+{% if not is_present %}
+
+    $.ajax({
+        url: "{% url 'add_to_cart' %}",
+        type: 'POST',
+        data: {
+            'product_id': {{prod.id}},
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+           location.reload();
+        },
+        error: handleAjaxError
+    });
+{% endif %}
+});
+
+$('.wishlist').click(function(){
+let my_id = {{prod.id}};
+{% if not w_present %}
+
+    $.ajax({
+        url: "{% url 'add_to_wish' %}",
+        type: 'POST',
+        data: {
+            'product_id': {{prod.id}},
+            'csrfmiddlewaretoken': '{{ csrf_token }}'
+        },
+        success: function(response) {
+           location.reload();
+        },
+        error: handleAjaxError
+    });
+{% endif %}
+});
+
+
+</script>
+{% endif %}
+
+{% if not user.is_authenticated %}
+<script>
+$('.wishlist').click(function(){
+     window.location.href = "{% url 'signup' %}";
+});
+
+$('.cart').click(function(){
+     window.location.href = "{% url 'signup' %}";
+});
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,1 @@
+# This file is obsolete. Environment variables are now managed via .env and django-environ in Phase 8.

@@ -1,0 +1,183 @@
+{% extends "basic.html" %}
+{% block title %}Checkout - F&L{% endblock %}
+{% load static %}
+{% block body %}
+<div class="container my-5">
+    <!-- Progress Tracker -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 col-md-8">
+            <div class="d-flex justify-content-between text-center position-relative">
+                <div class="position-absolute top-50 start-0 w-100 border-top border-2 border-secondary" style="z-index: 1;"></div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-check-circle fa-2x text-success"></i><br>
+                    <small class="text-success fw-bold">Bag</small>
+                </div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-check-circle fa-2x text-success"></i><br>
+                    <small class="text-success fw-bold">Shipping</small>
+                </div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-eercast fa-2x text-success"></i><br>
+                    <small class="text-success fw-bold">Checkout</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4" style="font-family:Anton;">
+        <div class="col-lg-8">
+            <h3 class="mb-3">DELIVERY</h3>
+            <div class="card shadow-sm border-0 bg-light mb-4">
+                <div class="card-body">
+                    <p class="mb-0 fs-5">{{ship.ship_to}}</p>
+                </div>
+            </div>
+            
+            <hr class="my-4">
+            
+            <h3 class="mb-4">CHOOSE PAYMENT METHOD</h3>
+            
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="payment" id="card-radio" checked style="accent-color: #FF647F;">
+                        <label class="form-check-label h6 mb-0 pt-1" for="card-radio">ONLINE PAYMENT</label>
+                    </div>
+                    <div id="card_btn" class="ms-4">
+                        <form id="razorpay-form" action="{% url 'checkout' %}" method="post">{% csrf_token %}
+                            <input type="hidden" name="payment" value="card">
+                            <input type="hidden" name="razorpay_payment_id" id="razorpay_payment_id">
+                            <input type="hidden" name="razorpay_order_id" id="razorpay_order_id">
+                            <input type="hidden" name="razorpay_signature" id="razorpay_signature">
+                            {% if razorpay_order_id %}
+                                <button type="button" id="rzp-button1" class="btn btn-primary px-4 py-2" style="background-image: linear-gradient(#7dc5ee,#008cdd 85%,#30a2e4); border:0; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; font-weight: bold;">PAY WITH RAZORPAY</button>
+                            {% else %}
+                                <p class="text-danger">Payment gateway initialization failed.</p>
+                            {% endif %}
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm border-0 mb-3">
+                <div class="card-body">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="radio" name="payment" id="cod-radio" style="accent-color: #FF647F;">
+                        <label class="form-check-label h6 mb-0 pt-1" for="cod-radio">CASH ON DELIVERY</label>
+                    </div>
+                    <form action="{% url 'checkout' %}" method="POST">{% csrf_token %}
+                        <input type="hidden" name="payment" value="cash">
+                        <div id="cod_btn" class="ms-4" style="display:none;">
+                            <button class="btn btn-primary px-4 py-2" style="background-image: linear-gradient(#7dc5ee,#008cdd 85%,#30a2e4); border:0; font-family: 'Helvetica Neue',Helvetica,Arial,sans-serif; font-weight: bold;" type="submit">PLACE ORDER</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 bg-light">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="card-title mb-0 text-center">Your Shopping Bag <span class="text-muted fs-6">({{CART.total_item}} {% if CART.total_item == 1 %}item{% else %}items{% endif %})</span></h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 mb-4 justify-content-center">
+                        {% for item in CART.items.all %}
+                        <img src="{{item.prod.image.url}}" class="img-thumbnail" style="width:70px; height:90px; object-fit: cover;" alt="{{item.prod.prod_name}}">
+                        {% endfor %}
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-muted">Subtotal</span>
+                        <span>Rs. {{CART.cart_total}}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-muted">Delivery</span>
+                        <span>Rs. 49</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between">
+                        <span class="fs-5">Total</span>
+                        <span class="fs-5 text-danger" id="tot">Rs. {{CART.cart_total|add:"49"}}</span>
+                    </div>
+                    <script>
+                        let cartTot = {{ CART.cart_total }} + 49;
+                        document.getElementById('tot').innerHTML = "Rs. " + cartTot;
+                    </script>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const preventBack = function() { window.history.forward(); };
+        setTimeout(preventBack, 0);
+        window.onunload = function () { null };
+        
+        const card_btn = document.getElementById('card_btn');
+        const cod_btn = document.getElementById('cod_btn');
+        const cardRadio = document.getElementById('card-radio');
+        const codRadio = document.getElementById('cod-radio');
+
+        if (cardRadio) {
+            cardRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    card_btn.style.display = 'block';
+                    cod_btn.style.display = 'none';
+                } else {
+                    card_btn.style.display = 'none';
+                }
+            });
+        }
+        
+        if (codRadio) {
+            codRadio.addEventListener('change', function() {
+                if (this.checked) {
+                    cod_btn.style.display = 'block';
+                    card_btn.style.display = 'none';
+                } else {
+                    cod_btn.style.display = 'none';
+                }
+            });
+        }
+        
+        {% if razorpay_order_id %}
+        var options = {
+            "key": "{{ razorpay_key }}",
+            "amount": "{{ amt }}",
+            "currency": "INR",
+            "name": "F&L Fashion & Lifestyle",
+            "description": "Order Payment",
+            "order_id": "{{ razorpay_order_id }}",
+            "handler": function (response){
+                document.getElementById('razorpay_payment_id').value = response.razorpay_payment_id;
+                document.getElementById('razorpay_order_id').value = response.razorpay_order_id;
+                document.getElementById('razorpay_signature').value = response.razorpay_signature;
+                document.getElementById('razorpay-form').submit();
+            },
+            "prefill": {
+                "name": "{{ ship.name }}",
+                "contact": "{{ ship.contact }}"
+            },
+            "theme": {
+                "color": "#FF647F"
+            }
+        };
+        console.log("Frontend options amount:", options.amount);
+        console.log("Frontend options order_id:", options.order_id);
+        var rzp1 = new Razorpay(options);
+        rzp1.on('payment.failed', function (response){
+                alert("Payment Failed: " + response.error.description);
+        });
+        document.getElementById('rzp-button1').onclick = function(e){
+            rzp1.open();
+            e.preventDefault();
+        }
+        {% endif %}
+    });
+</script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+{% endblock %}

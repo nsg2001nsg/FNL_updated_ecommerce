@@ -1,0 +1,63 @@
+<div class="card h-100 product-card shadow-sm border-0">
+    <a href="/prodview/{{prod.id}}" class="d-block position-relative bg-light" style="aspect-ratio: 3/4; overflow: hidden; border-top-left-radius: var(--bs-card-inner-border-radius); border-top-right-radius: var(--bs-card-inner-border-radius);">
+        {% if prod.image %}
+        <img id="v{{prod.id}}" src="{{prod.image.url}}" class="position-absolute top-0 start-0 w-100 h-100" alt="{{prod.prod_name}}" style="object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-none align-items-center justify-content-center text-muted bg-light">
+            <i class="fa fa-image fa-3x"></i>
+        </div>
+        {% else %}
+        <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center text-muted bg-light">
+            <i class="fa fa-image fa-3x"></i>
+        </div>
+        {% endif %}
+    </a>
+    <div class="card-body product-card-body d-flex flex-column">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h5 class="card-title mb-0" style="font-family: Anton;">{{prod.prod_name}}</h5>
+            <div id="icon_div{{prod.id}}">
+                {% if is_wishlist_page %}
+                <form action="{% url 'del_wish' %}" method="POST" class="d-inline">{% csrf_token %}
+                    <input type="hidden" name="del_item" value="{{item_id}}">
+                    <button type="submit" class="btn btn-link p-0 text-secondary border-0"><i class="fa fa-trash fa-lg"></i></button>
+                </form>
+                {% else %}
+                    {% if prod.id in wishlisted_ids %}
+                    <i id="heart{{prod.id}}" class="fa fa-heart fa-lg text-danger" style="cursor:pointer;" title="Wishlisted"></i>
+                    {% else %}
+                    <i id="heart{{prod.id}}" class="fa fa-heart-o fa-lg text-secondary" style="cursor:pointer;" title="Add to Wishlist"></i>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+        <p class="card-text flex-grow-1 text-muted small">{{prod.prod_desc|slice:"0:40"}}...</p>
+        <p class="card-text mb-3"><b>Rs. {{prod.price}}</b></p>
+        <a href="/prodview/{{prod.id}}" class="btn mt-auto w-100" style="background-color:#FF647F; color:white; border-color:pink;">
+            QUICK VIEW
+        </a>
+    </div>
+</div>
+
+<script>
+document.getElementById("heart{{prod.id}}").onclick = function() {
+    {% if user.is_authenticated %}
+        {% if prod.id not in wishlisted_ids %}
+        $.ajax({
+            url: "{% url 'add_to_wish' %}",
+            type: 'POST',
+            data: {
+                'product_id': {{prod.id}},
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                const heart = document.getElementById("heart{{prod.id}}");
+                heart.classList.remove('fa-heart-o', 'text-secondary');
+                heart.classList.add('fa-heart', 'text-danger');
+            },
+            error: handleAjaxError
+        });
+        {% endif %}
+    {% else %}
+    window.location.href = "{% url 'signup' %}";
+    {% endif %}
+};
+</script>

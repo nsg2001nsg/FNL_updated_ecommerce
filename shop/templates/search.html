@@ -1,0 +1,26 @@
+{% extends "basic.html" %}
+{% block title %}Search results{% endblock %}
+{% block head %}<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">{% endblock %}
+<!--   navbar ends here-->
+{% block body %}
+<div class="container my-5">
+    <h4 class="text-uppercase text-center mb-4" style="font-family:Anton; color:#646464;">SEARCH RESULTS FOR {{ query }}</h4>
+    
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for prod in prods %}
+        <div class="col">
+            {% include 'includes/product_card.html' %}
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted">No products found matching your search.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if prods.paginator.num_pages > 1 %}
+        {% include 'includes/pagination.html' %}
+    {% endif %}
+</div>
+{% endblock %}
+{% block js %}{% endblock %}

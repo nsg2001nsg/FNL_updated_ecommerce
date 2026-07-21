@@ -1,0 +1,30 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path("", views.index, name="index"),
+    path("Bag/", views.Bag, name="Bag"),
+    path("search/", views.search, name="search"),
+    path("prodview/<int:myid>", views.prodview, name="prodview"),
+    path("wishlist/", views.wishlist, name="wishlist"),
+    path("address/", views.address, name="address"),
+    path('signup/', views.signup, name="signup"),
+    path('signin/', views.signin, name="signin"),
+    path('signout/', views.signout, name="signout"),
+    path('verify/', views.verify, name="verify"),
+    path('add_to_cart/', views.add_to_cart, name="add_to_cart"),
+    path('add_to_wish/', views.add_to_wish, name="add_to_wish"),
+    path('update_item/', views.update_item, name="update_item"),
+    path('empty_cart/', views.empty_cart, name="empty_cart"),
+    path('remove_item/', views.remove_item, name="remove_item"),
+    path('del_wish/', views.del_wish, name="del_wish"),
+    path('remove_address/', views.remove_address, name="remove_address"),
+    path('checkout/', views.checkout, name="checkout"),
+    path('payment_success/', views.payment_success, name="payment_success"),
+    path('payment_failed/', views.payment_failed, name="payment_failed"),
+    path('payment/webhook/', views.payment_webhook, name="payment_webhook"),
+    path('cancel_order_item/', views.cancel_order_item, name="cancel_order_item"),
+    path('orders/', views.orders, name="orders"),
+    path('catalogue/<slug:query>', views.catalogue, name="catalogue"),
+    path("menu/<int:myid>", views.menu, name="menu"),
+]

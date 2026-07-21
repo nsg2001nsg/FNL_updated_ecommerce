@@ -1,0 +1,463 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/html">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}{% endblock %}</title>
+    {% load static %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+       <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+  />
+      {% block head %}{% endblock %}
+    <link rel="stylesheet" href="{% static 'css/base.css' %}">
+  </head>
+  <body>
+<!--  navbar starts here-->
+   <nav class="navbar navbar-expand-sm py-3 " style="background-color:transparent; border-width:3px;" id="navbar">
+  <div class="container" id="brand">
+    <a class="navbar-brand d-flex flex-column align-items-center text-decoration-none" href="{% url 'index' %}" style="font-family: Anton; color:#646464; line-height: 1; max-width: 250px;">
+        <div class="d-flex align-items-baseline">
+            <h1 class="mb-0" style="color:#646464; font-weight: 900;">F</h1>
+            <h4 class="mb-0 mx-1" style="color:#646464; font-weight: 900;">&amp;</h4>
+            <h1 class="mb-0" style="color:#646464; font-weight: 900;">L</h1>
+        </div>
+        <h5 class="mb-0 mt-1" style="color:#646464; font-weight: 900;">Fashion &amp; Lifestyle</h5>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse navbar-ex1-collapse" id="navbarNavDropdown">
+      <ul class="navbar-nav px-1">
+        <li class="nav-item px-2">
+          <a class="nav-link cat" style="color:#a9a9a9;" id="fashion-link" onmouseout="this.style.color = '#B5B5B5';">Fashion</a>
+            <div class="modal catalogue" id="fashion-link-modal">
+              <div class="modal-content">
+                  <div class="row">
+                      <div class="col-md-3" style="color:white; font-family:Anton; " id="cat-content">
+                            <br><br>
+                            <p style="width:fit-content;"
+                               onmouseover="this.style.color = 'pink';
+                               document.getElementById('west-arrow-icon').style.display = 'inline-block';
+                               document.getElementById('west-cat').style.display = 'block';
+                               document.getElementById('eth-cat').style.display = 'none';
+                               document.getElementById('win-cat').style.display = 'none ';
+                               document.getElementById('eth-arrow-icon').style.display = 'none';
+                                document.getElementById('win-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          WESTERN WEAR<span><i id="west-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                            <br><br><br>
+                           <p style="width:fit-content;"
+                              onmouseover="this.style.color = 'pink';
+                              document.getElementById('eth-arrow-icon').style.display = 'inline-block';
+                              document.getElementById('eth-cat').style.display = 'block';
+                              document.getElementById('win-cat').style.display = 'none ';
+                              document.getElementById('west-cat').style.display = 'none ';
+                              document.getElementById('west-arrow-icon').style.display = 'none';
+                              document.getElementById('win-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          ETHNIC WEAR<span><i id="eth-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                            <br><br><br>
+                             <p style="width:fit-content;"
+                                onmouseover="this.style.color = 'pink';
+                                document.getElementById('win-arrow-icon').style.display = 'inline-block';
+                                document.getElementById('win-cat').style.display = 'block';
+                                document.getElementById('west-cat').style.display = 'none ';
+                                document.getElementById('eth-cat').style.display = 'none ';
+                                document.getElementById('west-arrow-icon').style.display = 'none';
+                                document.getElementById('eth-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          WINTER WEAR<span><i id="win-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                        </div>
+                      <div class="col-md-5" id="cont" style="color:white;">
+                          <div style="font-family:Anton; display:none;" id="west-cat">
+                              <div class="row">
+                                  <div class="col-md-6">
+                                      <a class="link" href="/menu/100"><h5 style="color:pink;">TOPWEAR</h5></a>
+                                      <a class="link" href="/menu/10"><p>Regular Tops</p></a>
+                                      <a class="link" href="/menu/5"><p>Crop Tops</p></a>
+                                      <a class="link" href="/menu/15"><p>Tshirts</p></a>
+                                      <a class="link" href="/menu/20"><p>Shirts</p></a>
+                                      <a class="link" href="/menu/200"><h5 style="color:pink;">BOTTOMWEAR</h5></a>
+                                      <a class="link" href="/menu/105"><p>Jeans</p></a>
+                                      <a class="link" href="/menu/110"><p>Trousers</p></a>
+                                      <a class="link" href="/menu/115"><p>Shorts</p></a>
+                                  </div>
+                                  <div class="col-md-6">
+                                      <a class="link" href="/menu/300"><h5 style="color:pink;">DRESSES</h5></a>
+                                      <a class="link" href="/menu/310"><p>Maxi Dresses</p></a>
+                                      <a class="link" href="/menu/305"><p>Long Dresses</p></a>
+                                      <a class="link" href="/menu/315"><p>Short Dresses</p></a>
+                                  </div>
+                            </div>
+                          </div>
+                          <div style="font-family:Anton; display:none;" id="eth-cat">
+                              <a class="link" href="/menu/400"><h5 style="color:pink;">SAREES</h5></a>
+                              <a class="link" href="/menu/405"><p>PartyWear Saree</p></a>
+                              <a class="link" href="/menu/410"><p>Regular Saree</p></a>
+                              <a class="link" href="/menu/500"><h5 style="color:pink;">ETHNIC DRESSES</h5></a>
+                              <a class="link" href="/menu/505"><p>PartyWear DressSuit</p></a>
+                              <a class="link" href="/menu/510"><p>Regular DressSuit</p></a>
+                          </div>
+                          <div style="font-family:Anton; display:none;" id="win-cat">
+                          <a class="link" href="/menu/25"><h5>Sweaters</h5></a>
+                               <br>
+                          <a class="link" href="/menu/30"><h5>Jackets</h5></a>
+                          </div>
+                      </div>
+                      <div class="col-md-4">
+                          {% load static %}
+                          <img src='{% static "shop/fash.jpeg" %}' alt="Los Angeles" class="d-block mx-auto" style="width:500px; height:360px;">
+                      </div>
+                  </div>
+              </div>
+            </div>
+        </li>
+        <li class="nav-item px-3">
+            <a class="nav-link cat" style="color:#a9a9a9;" id="beauty-link" onmouseout="this.style.color = '#B5B5B5';">Beauty</a>
+            <div class="modal catalogue" id="beauty-link-modal">
+              <div class="modal-content">
+                  <div class="row">
+                      <div class="col-md-3" style="color:white; font-family:Anton; " id="beauty-cat">
+                            <br><br>
+                            <p style="width:fit-content;"
+                               onmouseover="this.style.color = 'pink';
+                               document.getElementById('makeup-arrow-icon').style.display = 'inline-block';
+                                document.getElementById('make-cat').style.display = 'block';
+                                  document.getElementById('skin-cat').style.display = 'none ';
+                                  document.getElementById('bath-cat').style.display = 'none ';
+                                document.getElementById('skin-arrow-icon').style.display = 'none';
+                                document.getElementById('bath-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          MAKEUP<span><i id="makeup-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                            <br><br><br>
+                           <p style="width:fit-content;"
+                              onmouseover="this.style.color = 'pink';
+                              document.getElementById('skin-arrow-icon').style.display = 'inline-block';
+                              document.getElementById('skin-cat').style.display = 'block';
+                              document.getElementById('make-cat').style.display = 'none ';
+                              document.getElementById('bath-cat').style.display = 'none ';
+                              document.getElementById('makeup-arrow-icon').style.display = 'none';
+                              document.getElementById('bath-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          SKINCARE<span><i id="skin-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                            <br><br><br>
+                          <p style="width:fit-content;"
+                             onmouseover="this.style.color = 'pink';
+                             document.getElementById('bath-arrow-icon').style.display = 'inline-block';
+                             document.getElementById('bath-cat').style.display = 'block';
+                              document.getElementById('skin-cat').style.display = 'none ';
+                              document.getElementById('make-cat').style.display = 'none ';
+                             document.getElementById('makeup-arrow-icon').style.display = 'none';
+                             document.getElementById('skin-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          BATH & BODY<span><i id="bath-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                        </div>
+                      <div class="col-md-5" style="color:white;">
+                          <div style="font-family:Anton; display:none;" id="make-cat">
+                              <a href="/menu/1300" class="link"><h5 style="color:pink;">MAKEUP ESSENTIALS</h5></a>
+                              <a class="link" href="/menu/1305"><p>Foundation</p></a>
+                              <a class="link" href="/menu/1310"><p>Concealer</p></a>
+                              <a class="link" href="/menu/1315"><p>Compact Powder</p></a>
+                              <a class="link" href="/menu/1330"><p>Blush</p></a>
+                              <a class="link" href="/menu/1325"><p>Kajal</p></a>
+                              <a class="link" href="/menu/1320"><p>LipStick</p></a>
+                          </div>
+                          <div style="font-family:Anton; display:none;" id="skin-cat">
+                              <a href="/menu/1400" class="link"><h5 style="color:pink;">SKINCARE ESSENTIALS</h5></a>
+                              <a href="/menu/1405" class="link"><p>Cleanser</p></a>
+                              <a class="link" href="/menu/1410"><p>Serum</p></a>
+                              <a class="link" href="/menu/1415"><p>Sunscreen</p></a>
+                              <a class="link" href="/menu/1420"><p>LipBalm</p></a>
+                              <a class="link" href="/menu/1425"><p>Masks & Peels</p></a>
+                          </div>
+                           <div style="font-family:Anton; display:none;" id="bath-cat">
+                               <a href="/menu/1500" class="link"><h5 style="color:pink;">BATH & BODY ESSENTIALS</h5></a>
+                               <a class="link" href="/menu/1505"><p>Body Wash</p></a>
+                               <a class="link" href="/menu/1510"><p>Body Mist</p></a>
+                               <a class="link" href="/menu/1515"><p>Body Lotion</p></a>
+                          </div>
+                      </div>
+                      <div class="col-md-4">
+                          {% load static %}
+                          <img src='{% static "shop/make.jpeg" %}' alt="Los Angeles" class="d-block mx-auto" style="width:400px; height:360px;">
+                      </div>
+                  </div>
+              </div>
+            </div>
+        </li>
+        <li class="nav-item px-3">
+          <a class="nav-link cat" style="color:#a9a9a9;" id="lifestyle-link" onmouseout="this.style.color = '#B5B5B5';">Lifestyle</a>
+            <div class="modal catalogue" id="lifestyle-link-modal">
+              <div class="modal-content">
+                  <div class="row">
+                      <div class="col-md-3" style="color:white; font-family:Anton; " >
+                            <br><br>
+                            <p style="width:fit-content;"
+                               onmouseover="this.style.color = 'pink';
+                               document.getElementById('foot-arrow-icon').style.display = 'inline-block';
+                               document.getElementById('foot-cat').style.display = 'block';
+                              document.getElementById('access-cat').style.display = 'none';
+                              document.getElementById('jewel-cat').style.display = 'none';
+                               document.getElementById('access-arrow-icon').style.display = 'none';
+                               document.getElementById('jewel-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          FOOTWEAR<span><i id="foot-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                            <br><br><br>
+                           <p style="width:fit-content;"
+                              onmouseover="this.style.color = 'pink';
+                              document.getElementById('access-arrow-icon').style.display = 'inline-block';
+                              document.getElementById('access-cat').style.display = 'block';
+                              document.getElementById('foot-cat').style.display = 'none';
+                              document.getElementById('jewel-cat').style.display = 'none';
+                              document.getElementById('foot-arrow-icon').style.display = 'none';
+                              document.getElementById('jewel-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          ACCESSORIES<span><i id="access-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                            <br><br><br>
+                             <p style="width:fit-content;"
+                                onmouseover="this.style.color = 'pink';
+                                document.getElementById('jewel-arrow-icon').style.display = 'inline-block';
+                                document.getElementById('jewel-cat').style.display = 'block';
+                              document.getElementById('access-cat').style.display = 'none';
+                              document.getElementById('foot-cat').style.display = 'none';
+                                document.getElementById('foot-arrow-icon').style.display = 'none';
+                                document.getElementById('access-arrow-icon').style.display = 'none';" onmouseout="this.style.color = 'white';">
+                          JEWELLERY<span><i id="jewel-arrow-icon" class="fa fa-long-arrow-right fa-lg" style="display:none; margin-left:7px;"></i></span>
+                        </p>
+                        </div>
+                          <div class="col-md-5" style="color:white;">
+                            <div style="display:none;" id="foot-cat">
+                              <div class="row">
+                                  <div class="col-md-6">
+                                      <a href="/menu/800" class="link"><h5 style="color:pink;">FLATS</h5></a>
+                                      <a href="/menu/810" class="link"><p>Flip-Flops</p></a>
+                                      <a href="/menu/805" class="link"><p>Sandals</p></a>
+                                      <a href="/menu/700" class="link"><h5 style="color:pink;">HEELS</h5></a>
+                                      <a href="/menu/705" class="link"><p>Chunky-Platform Heels</p></a>
+                                      <a href="/menu/710" class="link"><p>Pencil-Pointed Heels</p></a>
+                                  </div>
+                                  <div class="col-md-6">
+                                      <a href="/menu/600" class="link"><h5 style="color:pink;">SHOES</h5></a>
+                                      <a href="/menu/610" class="link"><p>Casual Shoes</p></a>
+                                      <a href="/menu/605" class="link"><p>Sneakers</p></a>
+                                      <a href="/menu/1200" class="link"><h5 style="color:pink;">BOOTS</h5></a>
+                                      <a href="/menu/1210" class="link"><p>Flat Boots</p></a>
+                                      <a href="/menu/1205" class="link"><p>Heeled Boots</p></a>
+                                  </div>
+                          </div>
+                      </div>
+                             <div style="display:none;" id="access-cat">
+                                 <a href="/menu/1100" class="link"><h5 style="color:pink;">EYEWEAR</h5></a>
+                                 <a class="link" href="/menu/1110"><p>Casual Glasses</p></a>
+                                 <a class="link" href="/menu/1105"><p>SunGlasses</p></a>
+                                 <a href="/menu/900" class="link"><h5 style="color:pink;">BAGS</h5></a>
+                                 <a class="link" href="/menu/910"><p>Hand Bags</p></a>
+                                 <a class="link" href="/menu/905"><p>Purse</p></a>
+                          </div>
+                           <div style="display:none;" id="jewel-cat">
+                               <a href="/menu/1000" class="link"><h5 style="color:pink;">Imitation Jewellery</h5></a>
+                               <a class="link" href="/menu/1015"><p>Pendants</p></a>
+                               <a class="link" href="/menu/1005"><p>Bracelets</p></a>
+                               <a class="link" href="/menu/1010"><p>Earrings</p></a>
+                               <a class="link" href="/menu/1020"><p>Rings</p></a>
+                          </div>
+                          </div>
+                      <div class="col-md-4">
+                          {% load static %}
+                          <img src='{% static "shop/access.jpg" %}' alt="Los Angeles" class="d-block mx-auto" style="width:400px; height:360px;">
+                      </div>
+                  </div>
+              </div>
+            </div>
+        </li>
+        <li class="nav-item px-3 ">
+          <a class="nav-link" style="color:#a9a9a9;" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            Services
+          </a>
+        </li>
+      </ul>
+    </div>
+     <form class="d-flex" style="" role="search" action="{% url 'search' %}" method="get">
+        <input class="form-control me-2" type="search" placeholder="What are you looking for?" aria-label="Search" id="query" name="query" style="width: 470px; position: relative; left: -50px; border-radius:999px; border:2px solid pink;">
+         <button class="btn" type="submit" style="position:relative; left:-60px;"><i class="fa fa-search fa-lg" style = "color:gray;"></i></button>
+      </form>
+      <div class="popover__wrapper">
+        <i class="fa fa-user-circle fa-lg" role="button" aria-hidden="true" style = "position:relative; top:-13px; right:15px; color:#646464;"></i>
+          <div class="popover__content" style="text-align: center; z-index:2;">
+              {% if not user.is_authenticated %}
+                  <p class="popover__message"><b>Welcome!</b></p>
+                  <a href="{% url 'signup' %}"><button type="button" style="border:0; background-color: #FF647F; width:140px; height:35px; color:white;">Signup/Login</button></a><br>
+              {% endif %}
+              {% if user.is_authenticated %}
+                  <p class="popover__message"><b>Hello</b></p>
+                  <p class="popover__message"><b>{{ user }}</b></p>
+              {% endif %}
+              <hr>
+              <button type="button" style="border:0; background-color:white; color:gray;" onclick="window.location.href = {% url 'orders' %};" onmouseover="this.style.color='black'" onmouseout="this.style.color='gray'">Orders</button><br>
+              <button type="button" style="border:0; background-color:white; color:gray;" onclick="window.location.href = {% url 'wishlist' %};" onmouseover="this.style.color='black'" onmouseout="this.style.color='gray'">Wishlist</button><br>
+              {% if user.is_authenticated %}
+              <a href="{% url 'signout' %}"><button type="button" style="border:0; background-color:white; color:gray;" onmouseover="this.style.color='black'" onmouseout="this.style.color='gray'">Logout</button></a><br>
+              {% endif %}
+          </div>
+      </div>
+          <a href="{% url 'Bag' %}"><button class="button" type="button" style="position: relative; height:30px; width:30px; left:29px; top:8px; background-color:transparent;border:0;">
+                <i class="fa fa-shopping-bag fa-lg" aria-hidden="true" style="position:relative; color:#646464; left:-7px; top:1px;">
+                    <span class="badge badge-light" style=" position: relative;
+                        top: 12px;
+                        left: -5px;
+                        color:#646464;"><span id="cart" style="position:relative; left:25px; top:-20px;"></span>
+                    </span>
+                </i>
+           </button></a>
+    <a href="{% url 'wishlist' %}">
+        <i class="fa fa-heart fa-lg" aria-hidden="true" style="position:relative; left:70px; color:#646464; top:1px;">
+            <span class="badge badge-light" style=" position: relative;
+                top: 12px;
+                left: -10px;
+                color: #646464;">
+            <span id="wishlist"  style="position:relative; left:-10px; top:-1px;"></span>
+            </span>
+        </i>
+    </a>
+  </div>
+</nav>
+<!--   navbar ends here-->
+{% for message in messages %}
+<div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+    <strong>Message: </strong>{{ message }}
+    <button class="close" type="button" data-dismiss="alert" aria-label="Close">
+    <span aria-hidden="true">&times;</span></button>
+</div>
+{% endfor %}
+<div id="js-messages-container"></div>
+
+{% block body %}{% endblock %}
+
+<!-- Footer -->
+<footer class="bg-dark text-light py-5 mt-auto">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <h5 style="font-family: Anton;">F&L Fashion & Lifestyle</h5>
+                <p class="small text-secondary">Bringing you the latest trends in Fashion, Beauty, and Lifestyle with uncompromising quality and style.</p>
+            </div>
+            <div class="col-md-2 mb-4">
+                <h6 class="text-uppercase mb-3">Quick Links</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a href="{% url 'index' %}" class="text-secondary text-decoration-none">Home</a></li>
+                    <li class="mb-2"><a href="{% url 'Bag' %}" class="text-secondary text-decoration-none">Cart</a></li>
+                    <li class="mb-2"><a href="{% url 'wishlist' %}" class="text-secondary text-decoration-none">Wishlist</a></li>
+                    <li class="mb-2"><a href="{% url 'orders' %}" class="text-secondary text-decoration-none">Orders</a></li>
+                </ul>
+            </div>
+            <div class="col-md-2 mb-4">
+                <h6 class="text-uppercase mb-3">Categories</h6>
+                <ul class="list-unstyled small">
+                    <li class="mb-2"><a href="/catalogue/fashion" class="text-secondary text-decoration-none">Fashion</a></li>
+                    <li class="mb-2"><a href="/catalogue/beauty" class="text-secondary text-decoration-none">Beauty</a></li>
+                    <li class="mb-2"><a href="/catalogue/lifestyle" class="text-secondary text-decoration-none">Lifestyle</a></li>
+                </ul>
+            </div>
+            <div class="col-md-4 mb-4">
+                <h6 class="text-uppercase mb-3">Contact Us</h6>
+                <ul class="list-unstyled small text-secondary">
+                    <li class="mb-2" aria-hidden="true"><i class="fa fa-map-marker me-2"></i> 123 Fashion Street, NY 10001</li>
+                    <li class="mb-2" aria-hidden="true"><i class="fa fa-phone me-2"></i> +1 (555) 123-4567</li>
+                    <li class="mb-2" aria-hidden="true"><i class="fa fa-envelope me-2"></i> support@fandl.com</li>
+                </ul>
+            </div>
+        </div>
+        <hr class="mb-4 border-secondary">
+        <div class="row">
+            <div class="col-md-12 text-center text-secondary small">
+                &copy; 2026 F&L Fashion & Lifestyle. All rights reserved.
+            </div>
+        </div>
+    </div>
+</footer>
+
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz9ATKxIep9tiCxS/Z9fNfEXiDAYTujMAeBAsjFuCZSmKbSSUnQlmh/jp3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-mQ93GR66B00ZXjt0YO5KlohRA5SY2XofN4zfuZxLkoj1gXtW8ANNCe9d5Y3eG5eD" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+<script>
+const popoverTriggerList = document.querySelectorAll('[data-bs-toggle="popover"]');
+const popoverList = [...popoverTriggerList].map(popoverTriggerEl => new bootstrap.Popover(popoverTriggerEl));
+const popover = new bootstrap.Popover('.popover-dismiss', {
+  trigger: 'focus'
+})
+</script>
+
+{% if user.is_authenticated %}
+<script>
+    {% if CART.total_item > 0 %}
+        document.getElementById('cart').innerHTML = {{CART.total_item}};
+    {% endif %}
+    {% if wish.total_items > 0 %}
+        document.getElementById('wishlist').innerHTML = {{wish.total_items}};
+    {% endif %}
+</script>
+{% endif %}
+
+<script>
+function showMessage(msg, tags) {
+    const container = document.getElementById('js-messages-container');
+    if (!container) return;
+    const alertHtml = '<div class="alert alert-' + tags + ' alert-dismissible fade show" role="alert"><strong>Message: </strong>' + msg + '<button class="close" type="button" data-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove()"><span aria-hidden="true">&times;</span></button></div>';
+    container.innerHTML += alertHtml;
+}
+
+function handleAjaxError(xhr, status, error) {
+    if (xhr.status === 401 || xhr.status === 403) {
+        window.location.href = "{% url 'signup' %}";
+    } else if (xhr.status === 404) {
+        showMessage("Item not found.", "warning");
+    } else {
+        showMessage("An error occurred. Please try again.", "danger");
+    }
+}
+</script>
+<script>
+const modals = document.querySelectorAll(".catalogue");
+document.querySelectorAll(".cat").forEach(function(link) {
+  link.addEventListener("mouseenter", function() {
+    link.style.color = 'gray';
+     modals.forEach(function(modal) {
+          modal.style.display = "none";
+       });
+       Modal = document.getElementById(link.id+'-modal');
+        Modal.style.display = "block";
+
+        window.addEventListener("mouseover", function(event){
+    if (event.target != Modal && !Modal.contains(event.target) && event.target.id != 'navbar' && event.target.id != 'brand') {
+      Modal.style.display = "none";
+  }
+});
+
+  });
+});
+
+document.getElementById("fashion-link").addEventListener("click", function(event) {
+  document.getElementById("fashion-link-modal").style.display = "none";
+  window.location.href = "/catalogue/fashion";
+});
+
+document.getElementById("beauty-link").addEventListener("click", function(event) {
+  document.getElementById("beauty-link-modal").style.display = "none";
+  window.location.href = "/catalogue/beauty";
+});
+
+document.getElementById("lifestyle-link").addEventListener("click", function(event) {
+  document.getElementById("lifestyle-link-modal").style.display = "none";
+  window.location.href = "/catalogue/lifestyle";
+});
+
+</script>
+{% block js %}
+{% endblock %}
+  </body>
+</html>

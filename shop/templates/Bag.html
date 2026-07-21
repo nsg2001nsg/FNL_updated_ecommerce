@@ -1,0 +1,214 @@
+{% extends "basic.html" %}
+{% block title %}Bag - F&L{% endblock %}
+{% load static %}
+{% block body %}
+<div class="container my-5">
+    <!-- Progress Tracker -->
+    {% if CART and CART.total_item != 0 %}
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 col-md-8">
+            <div class="d-flex justify-content-between text-center position-relative">
+                <div class="position-absolute top-50 start-0 w-100 border-top border-2 border-secondary" style="z-index: 1;"></div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-eercast fa-2x text-success"></i><br>
+                    <small class="fw-bold">Bag</small>
+                </div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-circle fa-2x text-secondary"></i><br>
+                    <small class="text-secondary">Shipping</small>
+                </div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-circle fa-2x text-secondary"></i><br>
+                    <small class="text-secondary">Checkout</small>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    {% if request.user.is_authenticated and CART.total_item != 0 %}
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="text-end mb-3">
+                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#clearCartModal">
+                    <i class="fa fa-trash"></i> Clear Cart
+                </button>
+            </div>
+
+            <!-- Clear Cart Modal -->
+            <div class="modal fade" id="clearCartModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Clear Cart</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body text-start">
+                            Are you sure you want to clear all items from your bag?
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <a href="{% url 'empty_cart' %}" class="btn btn-danger">Yes, Clear</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% for item in CART.items.all %}
+            <div class="card mb-3 shadow-sm border-0">
+                <div class="row g-0">
+                    <div class="col-4 col-sm-3 col-md-2">
+                        <img src="{{item.prod.image.url}}" class="img-fluid rounded-start w-100 h-100" style="object-fit: cover; max-height: 150px;" alt="{{item.prod.prod_name}}">
+                    </div>
+                    <div class="col-8 col-sm-9 col-md-10">
+                        <div class="card-body d-flex flex-column h-100 justify-content-between">
+                            <div class="row">
+                                <div class="col-8">
+                                    <h5 class="card-title text-truncate" style="font-family:Anton;">{{item.prod}}</h5>
+                                    <p class="card-text mb-0"><b class="text-danger">Rs. {{item.prod.price}}</b></p>
+                                </div>
+                                <div class="col-4 text-end">
+                                    <small class="text-muted d-block mb-1">QTY: <b id="q{{item.prod.id}}">{{item.quantity}}</b></small>
+                                    <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#qtyModal{{item.prod.id}}" aria-label="Update Quantity">
+                                        <i class="fa fa-pencil"></i>
+                                    </button>
+                                    
+                                    <!-- Quantity Modal -->
+                                    <div class="modal fade text-start" id="qtyModal{{item.prod.id}}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-sm">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title text-center w-100" style="font-family:Anton;">Select Quantity</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body text-center">
+                                                    <small class="text-muted d-block mb-3">{{item.prod.prod_stock}} left in stock</small>
+                                                    <div class="d-flex justify-content-center align-items-center gap-3 mb-3">
+                                                        <button class="btn btn-outline-secondary rounded-circle" id="decrement{{item.prod.id}}" style="width: 40px; height: 40px;" aria-label="Decrease quantity">-</button>
+                                                        <h5 id="qtynum{{item.prod.id}}" class="mb-0">{{item.quantity}}</h5>
+                                                        <button class="btn btn-outline-secondary rounded-circle" id="increment{{item.prod.id}}" style="width: 40px; height: 40px;" aria-label="Increase quantity">+</button>
+                                                    </div>
+                                                    <button class="btn btn-danger w-100" id="updateBtn{{item.prod.id}}" style="font-family:Anton;">UPDATE</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="text-end mt-2">
+                                <button type="button" class="btn btn-link text-danger p-0 text-decoration-none" onclick="rem_func({{item.prod.id}})">
+                                    <i class="fa fa-trash" aria-hidden="true"></i> Remove Item
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4" style="font-family:Anton;">Order Summary</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span style="font-family:Anton;" class="text-muted">Bag Total</span>
+                        <span>Rs. {{CART.cart_total}}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span style="font-family:Anton;" class="text-muted">Delivery Fee</span>
+                        <span>Rs. 49</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span style="font-family:Anton; font-size: 1.2rem;">Order Total</span>
+                        <span style="font-weight: bold; font-size: 1.2rem;">Rs. <span id="total"></span></span>
+                    </div>
+                    <a href="{% url 'address' %}" class="btn w-100 py-2 text-white" style="font-family:Anton; font-size: 1.1rem; background-color:#FF647F; border:0;">PLACE ORDER</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center py-5">
+            {% if request.user.is_authenticated %}
+                <img src="{% static 'shop/empty_bag.jpg' %}" class="img-fluid mb-4" style="max-height: 200px;" alt="Empty Bag">
+                <h3 style="font-family:Anton; color:#FF647F;">Looks like your bag is empty!</h3>
+                <a href="{% url 'index' %}" class="btn btn-primary mt-3" style="background-color: #FF647F; border:0;">Continue Shopping</a>
+            {% else %}
+                <img src="{% static 'shop/empty_bag.jpg' %}" class="img-fluid mb-4" style="max-height: 200px;" alt="Empty Bag">
+                <h3 style="font-family:Anton; color:#FF647F;">Looks like your bag is empty!</h3>
+                <h5 class="text-muted mt-3">Login to view your bag or start shopping</h5>
+                <a href="{% url 'signup' %}" class="btn btn-primary mt-3" style="background-color: #FF647F; border:0;">Login / Signup</a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+{% block js %}
+<script>
+    var $j = jQuery.noConflict();
+
+    {% if request.user.is_authenticated and CART.total_item != 0 %}
+    // Calculate total
+    const cart_tot = {{CART.cart_total}} + 49;
+    document.getElementById("total").innerHTML = cart_tot;
+
+    // Quantity update logic
+    {% for item in CART.items.all %}
+    (function() {
+        let qty = {{item.quantity}};
+        const maxQty = {{item.prod.prod_stock}};
+        
+        document.getElementById("decrement{{item.prod.id}}").onclick = function () {
+            if (qty >= 2) {
+                qty -= 1;
+                document.getElementById("qtynum{{item.prod.id}}").innerHTML = qty;
+            }
+        };
+        
+        document.getElementById("increment{{item.prod.id}}").onclick = function () {
+            if (qty < maxQty) {
+                qty += 1;
+                document.getElementById("qtynum{{item.prod.id}}").innerHTML = qty;
+            }
+        };
+        
+        $j('#updateBtn{{item.prod.id}}').click(function() {
+            const newQty = qty;
+            $j.ajax({
+                url: '{% url "update_item" %}',
+                type: 'POST',
+                data: {
+                    'new_qty': newQty,
+                    'product_id': {{item.prod.id}},
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(response) {
+                    location.reload();
+                },
+                error: handleAjaxError
+            });
+        });
+    })();
+    {% endfor %}
+
+    function rem_func(id) {
+        $j.ajax({
+            url: '{% url "remove_item" %}',
+            type: 'POST',
+            data: {
+                'product_id': id,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                location.reload();
+            },
+            error: handleAjaxError
+        });
+    }
+    {% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "basic.html" %}
+{% block title %}Menu{% endblock %}
+<!--   navbar ends here-->
+{% block body %}
+<div class="container my-5" style="font-family:Anton;">
+    <h4 class="text-center text-uppercase mb-4" style="color: #646464;">{{cat}}</h4>
+    
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+        {% for prod in prods %}
+        <div class="col">
+            {% include 'includes/product_card.html' %}
+        </div>
+        {% empty %}
+        <div class="col-12 text-center">
+            <p class="text-muted" style="font-family: sans-serif;">No products found in this category.</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    {% if prods.paginator.num_pages > 1 %}
+        {% include 'includes/pagination.html' %}
+    {% endif %}
+</div>
+{% endblock %}
+{% block js %}{% endblock %}

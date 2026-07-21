@@ -1,0 +1,37 @@
+{% extends "basic.html" %}
+{% block title %}Login{% endblock %}
+{% block css %}
+body{
+     background-color:#ffe9ec;
+    }
+{% endblock %}
+<!--   navbar ends here-->
+{% block body %}
+<div class="container my-3">
+<div class="card" style="width: 30rem; margin:auto; border:0; padding:1.5rem;">
+    <div style=" text-align:center;">
+    <a class="navbar-brand" style="font-family: Anton"><h2 style="display: inline-block; color:black; position:relative;" >F</h2>
+      <h5 style="display: inline-block; color:black; position:relative;" >&</h5>
+        <h2 style="display: inline-block; color:black; position:relative;" >L</h2><h6 style="color:black">Fashion & Lifestyle</h6></a></div>
+  <div class="card-body">
+    <h5 class="card-title">Login</h5>
+    <form action="{% url 'signin' %}" method="POST">{% csrf_token %}
+    <div>
+    <label for="email" style="position:relative; background-color:white; color:black; top:10px; left:10px;">Email</label><br>
+    <input id="email" name="email" type="email" style="width:100%; height:3rem;" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$" required><br>
+    </div><br>
+        <div>
+    <label for="password" style="position:relative; background-color:white; color:black; top:10px; left:10px;">Password</label><br>
+    <input id="password" name="password" type="password" style="width:100%; height:3rem;" required><br>
+    </div><br>
+        <figure class="text-center">
+            <button type="submit" style="background-color: #FF647F; color:white; border:0; width:50%; height:2rem;"><b>Continue</b> </button><br></figure>
+        <div>
+</div>
+</form>
+  </div>
+</div>
+</div>
+
+{% endblock %}
+{% block js %}{% endblock %}

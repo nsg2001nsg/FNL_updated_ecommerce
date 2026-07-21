@@ -1,0 +1,111 @@
+/* catalogue.css */
+body {
+    background-color: white;
+}
+
+.banner {
+    align-items: center;
+    display: flex;
+    height: 100vh;
+    position: relative;
+    justify-content: center;
+    z-index: -1;
+}
+
+.banner__title {
+    color: pink;
+    font-size: 60px;
+    font-weight: 700;
+    padding: 0 20px;
+    position: absolute;
+    left: 600px;
+    text-transform: uppercase;
+}
+
+.banner__image {
+    top: 140px;
+    border-radius: 20px;
+    position: fixed;
+    height: 750px;
+    width: 1580px;
+}
+
+.content {
+    background-color: white;
+    font-size: 40px;
+    padding: 120px 80px;
+    height: 100vh;
+}
+
+/* Lifestyle Specific Styles */
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:wght@900&display=swap');
+
+header {
+    height: 170vh;
+}
+
+.contain {
+    overflow: hidden;
+    position: absolute;
+    height: 90vh;
+    left: 2px;
+    max-width: 1579px;
+    -webkit-mask-image: -webkit-linear-gradient(top, #ffffff 0%, #ffffff 100%);
+}
+
+.container_solid {
+    background: transparent;
+}
+
+.title_wrapper {
+    position: fixed;
+    display: block;
+    margin: auto;
+    width: 100%;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.title_wrapper h1 {
+    text-align: center;
+    font-size: 64px;
+    text-transform: uppercase;
+    font-family: 'Fraunces', serif;
+    font-weight: 900;
+}
+
+.container_solid .title_wrapper h1 {
+    background: url('../img/foot.jpg'); /* Note: this URL will need to be fixed in the template using inline styles or static tags if it's dynamic, but for now we extract the CSS */
+    background-size: 100vw auto;
+    background-position: center;
+    text-fill-color: transparent;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: black;
+}
+
+.container_image {
+    background-image: url('../img/footwear.jpg'); /* Same note */
+    background-size: 100vw;
+    background-position: center;
+    background-attachment: fixed;
+    top: 100vh;
+}
+
+.container_image .title_wrapper h1 {
+    color: white;
+}
+
+section {
+    padding: 2em;
+    margin: auto;
+}
+
+section h2 {
+    font-family: 'Fraunces', serif;
+}
+
+section p {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji";
+}

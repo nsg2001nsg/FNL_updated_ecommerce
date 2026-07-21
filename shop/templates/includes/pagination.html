@@ -1,0 +1,17 @@
+<div class="pagination mt-4 mb-4 d-flex justify-content-center">
+    <span class="step-links">
+        {% if prods.has_previous %}
+            <a href="?{% if query %}query={{ query }}&{% endif %}page=1" class="text-decoration-none me-2" style="color: #FF647F;">&laquo; first</a>
+            <a href="?{% if query %}query={{ query }}&{% endif %}page={{ prods.previous_page_number }}" class="text-decoration-none me-2" style="color: #FF647F;">previous</a>
+        {% endif %}
+
+        <span class="current me-2" style="color: #646464;">
+            Page {{ prods.number }} of {{ prods.paginator.num_pages }}.
+        </span>
+
+        {% if prods.has_next %}
+            <a href="?{% if query %}query={{ query }}&{% endif %}page={{ prods.next_page_number }}" class="text-decoration-none me-2" style="color: #FF647F;">next</a>
+            <a href="?{% if query %}query={{ query }}&{% endif %}page={{ prods.paginator.num_pages }}" class="text-decoration-none" style="color: #FF647F;">last &raquo;</a>
+        {% endif %}
+    </span>
+</div>

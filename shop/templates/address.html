@@ -1,0 +1,221 @@
+{% extends "basic.html" %}
+{% block title %}Address - F&L{% endblock %}
+{% load static %}
+{% block body %}
+<div class="container my-5">
+    <!-- Progress Tracker -->
+    <div class="row justify-content-center mb-5">
+        <div class="col-12 col-md-8">
+            <div class="d-flex justify-content-between text-center position-relative">
+                <div class="position-absolute top-50 start-0 w-100 border-top border-2 border-secondary" style="z-index: 1;"></div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-check-circle fa-2x text-success"></i><br>
+                    <small class="text-success fw-bold">Bag</small>
+                </div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-eercast fa-2x text-success"></i><br>
+                    <small class="text-success fw-bold">Shipping</small>
+                </div>
+                <div class="position-relative bg-white px-3" style="z-index: 2;">
+                    <i class="fa fa-circle fa-2x text-secondary"></i><br>
+                    <small class="text-secondary">Checkout</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center mb-4 gap-3">
+                {% if ADDRESS %} 
+                <h4 style="font-family:Anton;" class="mb-0">Select Delivery Address</h4> 
+                <button class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#addAddressModal">
+                    <i class="fa fa-plus" aria-hidden="true"></i> ADD NEW ADDRESS
+                </button>
+                {% endif %}
+            </div>
+
+            <!-- Add Address Modal (Used both in modal and inline) -->
+            <div class="modal fade" id="addAddressModal" tabindex="-1" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" style="font-family:Anton;">Add New Address</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{% url 'address' %}" method="POST" id="myForm">{% csrf_token %}
+                                <h6 class="fw-bold mb-3">Contact Details</h6>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="text" name="name" class="form-control" id="inputName" placeholder="Name" required>
+                                            <label for="inputName">Name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-floating">
+                                            <input type="tel" name="number" class="form-control" id="inputMobile" pattern="[6-9]{1}[0-9]{9}" placeholder="Mobile No" required>
+                                            <label for="inputMobile">Mobile No</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <h6 class="fw-bold mb-3">Address</h6>
+                                <div class="row g-3 mb-4">
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" name="address1" class="form-control" id="inputAddress" placeholder="Flat number/Building name" required>
+                                            <label for="inputAddress">Flat number/Building name</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-12">
+                                        <div class="form-floating">
+                                            <input type="text" name="address2" class="form-control" id="inputAddress2" placeholder="Street/locality/town" required>
+                                            <label for="inputAddress2">Street/locality/town</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <input type="text" name="city" class="form-control" id="inputCity" placeholder="City" required>
+                                            <label for="inputCity">City</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <input type="text" name="state" id="inputState" class="form-control" placeholder="State" required>
+                                            <label for="inputState">State</label>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-floating">
+                                            <input type="text" name="pin" pattern="[0-9]{6}" maxlength="6" id="inputPin" class="form-control" placeholder="Pincode" required>
+                                            <label for="inputPin">Pincode</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input text-danger" type="radio" name="default_address" id="default_address" style="accent-color: red;">
+                                    <label class="form-check-label" for="default_address">Set as Default Address</label>
+                                </div>
+                                <button type="submit" class="btn btn-danger w-100 py-2" style="background-color:#FF647F; border:0; font-family:Anton;">ADD ADDRESS</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if ADDRESS %}
+                <!-- Default Address -->
+                {% if customer.default_ship %}
+                    {% for address in ADDRESS %}
+                        {% if address.id == customer.default_ship.id %}
+                        <div class="card mb-3 shadow-sm border-0 border-start border-danger border-4">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center mb-2">
+                                    <div class="form-check mb-0">
+                                        <input class="form-check-input" style="accent-color:red;" type="radio" name="address" value="{{address.id}}" onchange="check();" checked>
+                                    </div>
+                                    <h5 class="card-title mb-0 ms-2" style="font-family:Anton;">{{address.name}} <span class="badge bg-danger ms-2" style="font-family:sans-serif; font-size: 0.7rem;">Default</span></h5>
+                                </div>
+                                <div class="ms-4 ps-1">
+                                    <p class="card-text mb-1">{{address.ship_to}}</p>
+                                    <p class="card-text mb-1">{{address.city}}, {{address.State}} - {{address.pincode}}</p>
+                                    <p class="card-text mb-3 fw-bold">Contact: {{address.contact}}</p>
+                                    <button onclick="remove_address({{address.id}})" class="btn btn-sm btn-outline-secondary">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+
+                <!-- Other Addresses -->
+                {% for address in ADDRESS %}
+                    {% if address.id != customer.default_ship.id %}
+                    <div class="card mb-3 shadow-sm border-0">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <div class="form-check mb-0">
+                                    <input class="form-check-input" style="accent-color:red;" type="radio" id="add{{address.id}}" name="address" value="{{address.id}}" onchange="check();">
+                                </div>
+                                <h5 class="card-title mb-0 ms-2" style="font-family:Anton;">{{address.name}}</h5>
+                            </div>
+                            <div class="ms-4 ps-1">
+                                <p class="card-text mb-1">{{address.ship_to}}</p>
+                                <p class="card-text mb-1">{{address.city}}, {{address.State}} - {{address.pincode}}</p>
+                                <p class="card-text mb-3 fw-bold">Contact: {{address.contact}}</p>
+                                <button onclick="remove_address({{address.id}})" class="btn btn-sm btn-outline-secondary">Remove</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                <div class="card shadow-sm border-0 p-4">
+                    <h4 style="font-family:Anton;" class="mb-4">Add Delivery Address</h4>
+                    <span id="formContainer"></span>
+                </div>
+                <!-- Duplicate form for when there are no addresses -->
+                <script>
+                    document.addEventListener("DOMContentLoaded", function() {
+                        var originalForm = document.getElementById('myForm');
+                        if (originalForm) {
+                            var myForm = originalForm.cloneNode(true);
+                            myForm.id = 'myFormInline';
+                            document.getElementById('formContainer').appendChild(myForm);
+                        }
+                    });
+                </script>
+            {% endif %}
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0">
+                <div class="card-body p-4">
+                    <h5 class="card-title mb-4" style="font-family:Anton;">Order Summary</h5>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span style="font-family:Anton;" class="text-muted">Bag Total</span>
+                        <span>Rs. {{CART.cart_total}}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span style="font-family:Anton;" class="text-muted">Delivery Fee</span>
+                        <span>Rs. 49</span>
+                    </div>
+                    <hr>
+                    <div class="d-flex justify-content-between mb-4">
+                        <span style="font-family:Anton; font-size: 1.2rem;">Order Total</span>
+                        <span style="font-weight: bold; font-size: 1.2rem;">Rs. {{tot}}</span>
+                    </div>
+                    <a href="{% url 'checkout' %}" class="btn w-100 py-2 text-white" style="font-family:Anton; font-size: 1.1rem; background-color:#FF647F; border:0;">CHECKOUT</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block js %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    function check() {
+        const selected = document.querySelector('input[name="address"]:checked');
+        if (selected) {
+            console.log(selected.value);
+        }
+    }
+
+    function remove_address(id) {
+        $.ajax({
+            url: '{% url "remove_address" %}',
+            type: 'POST',
+            data: {
+                'address_id': id,
+                'csrfmiddlewaretoken': '{{ csrf_token }}'
+            },
+            success: function(response) {
+                location.reload();
+            },
+            error: handleAjaxError
+        });
+    }
+</script>
+{% endblock %}
