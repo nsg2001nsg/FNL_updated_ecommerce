@@ -1,18 +1,5 @@
-# Virtual environment
-venv/
-.env
-
-# Python
 __pycache__/
-*.py[cod]
 
-# Django
-db.sqlite3
-media/
 
-# IDE
-.idea/
-.vscode/
 
-# Logs
 *.log
