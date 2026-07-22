@@ -68,7 +68,10 @@ def generate_and_send_otp(email, password):
     otp = secrets.randbelow(9000) + 1000  # ensures 1000-9999
     logger.info(f"OTP generated for {email}")
 
-    # Save to temporary profile with hashed password
+    # Send email BEFORE saving profile to prevent incrementing attempts on network errors
+    send_otp_email(email, otp)
+    
+    # Save to temporary profile with hashed password ONLY if email succeeds
     hashed_password = make_password(password)
     
     if profile:
@@ -78,9 +81,6 @@ def generate_and_send_otp(email, password):
         profile.save()
     else:
         profile = Profile.objects.create(email=email, otp=otp, password=hashed_password, attempts=1)
-    
-    # Send email
-    send_otp_email(email, otp)
     
     return profile
 
