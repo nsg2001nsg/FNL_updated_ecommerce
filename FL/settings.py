@@ -55,6 +55,7 @@ DEBUG = env('DEBUG')
 ALLOWED_HOSTS = [
     "127.0.0.1",
     "localhost",
+    ".onrender.com",
 ]
 
 CSRF_TRUSTED_ORIGINS = env.list(
@@ -217,6 +218,8 @@ STORAGES = {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
 
 # Managing media
 MEDIA_URL = "/media/"
