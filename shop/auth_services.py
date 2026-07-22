@@ -23,6 +23,12 @@ def send_otp_email(email, otp):
     message = f"Hello!\n{otp} is your OTP to login to F&L\n-F&L"
     logger.info("Calling send_mail()")
     try:
+        logger.info(f"EMAIL_HOST={settings.EMAIL_HOST}")
+        logger.info(f"EMAIL_PORT={settings.EMAIL_PORT}")
+        logger.info(f"EMAIL_USE_TLS={settings.EMAIL_USE_TLS}")
+        logger.info(f"EMAIL_USE_SSL={getattr(settings, 'EMAIL_USE_SSL', False)}")
+        logger.info(f"EMAIL_HOST_USER={settings.EMAIL_HOST_USER}")
+        logger.info(f"DEFAULT_FROM_EMAIL={settings.DEFAULT_FROM_EMAIL}")
         send_mail(
             subject=subject,
             message=message,
