@@ -30,6 +30,7 @@ EMAIL_HOST = env('EMAIL_HOST', default='')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
 EMAIL_PORT = env('EMAIL_PORT', cast=int, default=587)
+EMAIL_TIMEOUT = 5  # Prevents server hang if SMTP is unresponsive
 
 
 RAZORPAY_KEY_ID = env('RAZORPAY_KEY_ID', default='')

@@ -59,6 +59,9 @@ class Profile(models.Model):
     email = models.EmailField(max_length=40, null=False)
     otp = models.PositiveIntegerField(validators=[MaxValueValidator(9999)], null=False)
     password = models.CharField(max_length=128, blank=False, null=False, default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    attempts = models.PositiveIntegerField(default=1)
 
     def __str__(self):
         return self.email
@@ -108,6 +111,12 @@ class Product(models.Model):
             return True
         else:
             return False
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(price__gte=0), name='product_price_gte_0'),
+            models.CheckConstraint(check=models.Q(prod_stock__gte=0), name='product_stock_gte_0'),
+        ]
 
     def __str__(self):
         return self.prod_name
@@ -165,6 +174,12 @@ class Order(models.Model):
     def delivery_date(self):
         return self.order_date + timedelta(days=7)
 
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(order_total__gte=0), name='order_total_gte_0'),
+            models.CheckConstraint(check=models.Q(order_quantity__gte=0), name='order_quantity_gte_0'),
+        ]
+
 
 class OrderItem(models.Model):
     order_id = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_items")
@@ -175,6 +190,11 @@ class OrderItem(models.Model):
     @property
     def item_total(self):
         return self.prod.price * self.quantity
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(quantity__gte=1), name='orderitem_quantity_gte_1'),
+        ]
 
 
 class Cart(models.Model):
@@ -204,6 +224,11 @@ class CartItem(models.Model):
     @property
     def item_total(self):
         return self.quantity * self.prod.price
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(check=models.Q(quantity__gte=1), name='cartitem_quantity_gte_1'),
+        ]
 
 
 class Address(models.Model):
@@ -252,6 +277,9 @@ class Payment(models.Model):
             models.Index(fields=['created_at']),
             models.Index(fields=['customer']),
             models.Index(fields=['payment_against']),
+        ]
+        constraints = [
+            models.CheckConstraint(check=models.Q(amount__gte=0), name='payment_amount_gte_0'),
         ]
 
     def save(self, *args, **kwargs):

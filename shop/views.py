@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from FL import settings
 from .models import *
@@ -23,12 +23,12 @@ from django.conf import settings
 
 
 def menu(request, myid):
-    if SubCategory.objects.filter(subcategory_id=myid).first():
-        category = SubCategory.objects.get(subcategory_id=myid)
+    category = SubCategory.objects.filter(subcategory_id=myid).first()
+    if category:
         categor = 0
         cat = category
     else:
-        categor = Category.objects.get(category_id=myid)
+        categor = get_object_or_404(Category, category_id=myid)
         category = 0
         cat = categor
     prods = Product.objects.filter(Q(subcategory_id=category) | Q(category_id=categor)).order_by('id')
@@ -60,22 +60,54 @@ def index(request):
 
 def search(request):
     customer = request.user
-    query = request.GET.get('query')
+    query = request.GET.get('query', '')
+    
+    # Search normalization: trim, lowercase, collapse multiple spaces
+    query = ' '.join(query.strip().lower().split())
+    
+    # 4. Empty search handling
+    if not query:
+        param = {'prods': [], 'query': '', 'empty_query': True}
+        if request.user.is_authenticated:
+            wishlisted_ids = wishItems.objects.filter(wishlist__customer=request.user).values_list('prod_id', flat=True)
+            param['wishlisted_ids'] = set(wishlisted_ids)
+        return render(request, "search.html", param)
+
     keywords = query.split()
-    stemmer = SnowballStemmer('english')
-    stemmed_querys = []
-    for keyword in keywords:
-        stemmed_querys.append(stemmer.stem(keyword))
-    q = Q()
-    for keyword in keywords:
-        q &= (
-            Q(prod_name__icontains=keyword) | 
-            Q(prod_desc__icontains=keyword) |
-            Q(category_id__category_name__icontains=keyword) |
-            Q(subcategory_id__subcategory_name__icontains=keyword) |
-            Q(section_id__section_name__icontains=keyword)
-        )
-    prods = Product.objects.filter(q).order_by('id')
+    
+    # 1. Exact match
+    prods = Product.objects.filter(prod_name__iexact=query)
+    
+    # 2. Partial match (all keywords must be in product name)
+    if not prods.exists():
+        q_name = Q()
+        for k in keywords:
+            q_name &= Q(prod_name__icontains=k)
+        prods = Product.objects.filter(q_name).order_by('id')
+        
+    # 3. Matching SubCategory
+    if not prods.exists():
+        q_subcat = Q()
+        for k in keywords:
+            q_subcat &= Q(subcategory_id__subcategory_name__icontains=k)
+        prods = Product.objects.filter(q_subcat).order_by('id')
+        
+    # 4. Matching Category
+    if not prods.exists():
+        q_cat = Q()
+        for k in keywords:
+            q_cat &= Q(category_id__category_name__icontains=k)
+        prods = Product.objects.filter(q_cat).order_by('id')
+        
+    # 5. Matching Section
+    if not prods.exists():
+        q_sec = Q()
+        for k in keywords:
+            q_sec &= Q(section_id__section_name__icontains=k)
+        prods = Product.objects.filter(q_sec).order_by('id')
+        
+    # If still no results, it will gracefully fall through and return an empty queryset.
+    
     paginator = Paginator(prods, settings.PRODUCTS_PER_PAGE)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -89,7 +121,7 @@ def search(request):
 
 
 def prodview(request, myid):
-    prod = Product.objects.filter(id=myid).first()
+    prod = get_object_or_404(Product, id=myid)
     params = {'prod': prod}
     if request.user.is_authenticated:
         customer = request.user
@@ -180,9 +212,11 @@ def signin(request):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
+            logger.info(f"Business Event: Successful login for {user.email}")
             messages.success(request, "Logged in succesfully")
             return redirect('index')
         else:
+            logger.warning(f"Business Event: Failed login attempt for {request.POST.get('email')}")
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, error)
@@ -224,9 +258,9 @@ def add_to_cart(request):
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == 'POST':
         customer = request.user
-        cart_obj = Cart.objects.get(customer=customer)
-        product_id = request.POST['product_id']
-        prod = Product.objects.get(id=product_id)
+        cart_obj = get_object_or_404(Cart, customer=customer)
+        product_id = request.POST.get('product_id')
+        prod = get_object_or_404(Product, id=product_id)
         # add the product to the cart
         cart_item = CartItem.objects.create(cart=cart_obj, prod=prod)
         cart_item.save()
@@ -238,9 +272,9 @@ def add_to_wish(request):
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == 'POST':
         customer = request.user
-        wish_obj = Wishlist.objects.get(customer=customer)
-        product_id = request.POST['product_id']
-        prod = Product.objects.get(id=product_id)
+        wish_obj = get_object_or_404(Wishlist, customer=customer)
+        product_id = request.POST.get('product_id')
+        prod = get_object_or_404(Product, id=product_id)
         # add the product to the cart
         wish_item = wishItems.objects.create(wishlist=wish_obj, prod=prod)
         wish_item.save()
@@ -251,10 +285,10 @@ def update_item(request):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == 'POST':
-        cart_obj = Cart.objects.get(customer=request.user)
-        qty = request.POST['new_qty']
-        prod = request.POST['product_id']
-        cart_item = CartItem.objects.get(cart=cart_obj, prod=prod)
+        cart_obj = get_object_or_404(Cart, customer=request.user)
+        qty = request.POST.get('new_qty')
+        prod = request.POST.get('product_id')
+        cart_item = get_object_or_404(CartItem, cart=cart_obj, prod_id=prod)
         cart_item.quantity = qty
         cart_item.save()
         return JsonResponse({'success': True})
@@ -264,10 +298,10 @@ def cancel_order_item(request):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == 'POST':
-        prod = Product.objects.get(id=request.POST['cancel_item'])
-        order_obj = Order.objects.get(order_id=request.POST['order_id'])
-        item_obj = OrderItem.objects.get(order_id=order_obj, prod=prod)
-        track_item = Track.objects.get(track_id=item_obj.track_id.track_id)
+        prod = get_object_or_404(Product, id=request.POST.get('cancel_item'))
+        order_obj = get_object_or_404(Order, order_id=request.POST.get('order_id'), customer=request.user)
+        item_obj = get_object_or_404(OrderItem, order_id=order_obj, prod=prod)
+        track_item = get_object_or_404(Track, track_id=item_obj.track_id.track_id)
         track_item.status = 'cancelled'
         track_item.item_code = 0
         track_item.save()
@@ -288,9 +322,9 @@ def remove_item(request):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == "POST":
-        cart_obj = Cart.objects.get(customer=request.user)
-        prod = request.POST['product_id']
-        cart_item = CartItem.objects.get(cart=cart_obj, prod=prod)
+        cart_obj = get_object_or_404(Cart, customer=request.user)
+        prod = request.POST.get('product_id')
+        cart_item = get_object_or_404(CartItem, cart=cart_obj, prod_id=prod)
         cart_item.delete()
         return JsonResponse({'success': True})
 
@@ -299,8 +333,8 @@ def del_wish(request):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == "POST":
-        wish_obj = Wishlist.objects.get(customer=request.user)
-        wish_item = wishItems.objects.get(wishlist=wish_obj, id=request.POST['del_item'])
+        wish_obj = get_object_or_404(Wishlist, customer=request.user)
+        wish_item = get_object_or_404(wishItems, wishlist=wish_obj, id=request.POST.get('del_item'))
         wish_item.delete()
         return redirect("wishlist")
 
@@ -309,8 +343,8 @@ def remove_address(request):
     if not request.user.is_authenticated:
         return JsonResponse({'success': False, 'error': 'Unauthorized'}, status=401)
     if request.method == "POST":
-        address_id = request.POST['address_id']
-        address_obj = Address.objects.get(customer=request.user, id=address_id)
+        address_id = request.POST.get('address_id')
+        address_obj = get_object_or_404(Address, customer=request.user, id=address_id)
         address_obj.delete()
         return JsonResponse({'success': True})
 
@@ -421,13 +455,46 @@ def payment_failed(request):
 
 from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
+import json
+from .payment_service import get_razorpay_client
 
 @csrf_exempt
 def payment_webhook(request):
-    # TODO: Implement webhook reconciliation
-    # TODO: Verify webhook signature
-    # TODO: Update Order/Payment status based on event (e.g. payment.captured, payment.failed)
-    # TODO: Handle Automatic refunds, Payment expiry, etc.
+    if request.method == 'POST':
+        webhook_signature = request.headers.get('X-Razorpay-Signature')
+        webhook_body = request.body.decode('utf-8')
+        
+        try:
+            client = get_razorpay_client()
+            webhook_secret = getattr(settings, 'RAZORPAY_WEBHOOK_SECRET', settings.RAZORPAY_KEY_SECRET)
+            client.utility.verify_webhook_signature(webhook_body, webhook_signature, webhook_secret)
+        except Exception as e:
+            logger.error(f"Webhook signature verification failed: {str(e)}")
+            return HttpResponse(status=400)
+            
+        try:
+            payload = json.loads(webhook_body)
+            event = payload.get('event')
+            
+            if event == 'payment.captured':
+                payment_entity = payload['payload']['payment']['entity']
+                rzp_payment_id = payment_entity.get('id')
+                
+                if rzp_payment_id:
+                    payment = Payment.objects.filter(gateway_payment_id=rzp_payment_id).first()
+                    if payment and payment.status != 'SUCCESS':
+                        payment.status = 'SUCCESS'
+                        payment.save()
+                        if payment.payment_against:
+                            payment.payment_against.status = 'PAID'
+                            payment.payment_against.save()
+                        logger.info(f"Webhook: Payment {rzp_payment_id} captured successfully.")
+                        
+            return HttpResponse(status=200)
+        except Exception as e:
+            logger.exception("Error processing webhook")
+            return HttpResponse(status=500)
+            
     return HttpResponse(status=200)
 
 

@@ -1,6 +1,9 @@
 import secrets
 from django.core.mail import send_mail
 from django.conf import settings
+from django.contrib.auth.hashers import make_password
+from django.utils import timezone
+from datetime import timedelta
 from .models import Profile, Customer
 import logging
 
@@ -30,7 +33,7 @@ def send_otp_email(email, otp):
         logger.info("Email successfully sent")
     except Exception as e:
         logger.exception("send_mail failed")
-        raise
+        raise CustomerCreationError("Failed to send OTP email. Please try again later.")
 
 def generate_and_send_otp(email, password):
     """
@@ -39,15 +42,32 @@ def generate_and_send_otp(email, password):
     if Customer.objects.filter(email=email).exists():
         raise CustomerCreationError("A user with this email already exists.")
 
-    # Clean up old profile if user requested OTP again
-    Profile.objects.filter(email=email).delete()
+    # Check rate limit and cooldown
+    profile = Profile.objects.filter(email=email).first()
+    if profile:
+        # Block if 5 attempts within the last hour
+        if profile.attempts >= 5 and timezone.now() - profile.created_at < timedelta(hours=1):
+            logger.warning(f"Rate limit hit for signup: {email}")
+            raise CustomerCreationError("Too many signup attempts. Please try again later.")
+            
+        # Cooldown check: 60 seconds between OTPs
+        if timezone.now() - profile.updated_at < timedelta(seconds=60):
+            raise CustomerCreationError("Please wait 60 seconds before requesting another OTP.")
 
     # Generate secure 4-digit OTP using secrets
     otp = secrets.randbelow(9000) + 1000  # ensures 1000-9999
-    logger.info("OTP generated: %s", otp)
+    logger.info(f"OTP generated for {email}")
 
-    # Save to temporary profile
-    profile = Profile.objects.create(email=email, otp=otp, password=password)
+    # Save to temporary profile with hashed password
+    hashed_password = make_password(password)
+    
+    if profile:
+        profile.otp = otp
+        profile.password = hashed_password
+        profile.attempts += 1
+        profile.save()
+    else:
+        profile = Profile.objects.create(email=email, otp=otp, password=hashed_password, attempts=1)
     
     # Send email
     send_otp_email(email, otp)
@@ -64,6 +84,11 @@ def verify_otp_and_create_customer(email, submitted_otp):
     if not profile:
         raise OTPVerificationFailed("No pending signup found for this email.")
         
+    # Check Expiry (10 minutes)
+    if timezone.now() - profile.updated_at > timedelta(minutes=10):
+        profile.delete()
+        raise OTPVerificationFailed("OTP has expired. Please request a new one.")
+        
     if str(profile.otp) != str(submitted_otp):
         raise OTPVerificationFailed("Invalid OTP.")
         
@@ -71,10 +96,14 @@ def verify_otp_and_create_customer(email, submitted_otp):
         profile.delete()
         raise CustomerCreationError("A user with this email already exists.")
         
-    # Create the user using the password stored in the temporary profile
-    customer = Customer.objects.create_user(email=email, password=profile.password)
+    # Create the user without a password, then manually assign the hashed password
+    # This prevents the password from being double-hashed by create_user
+    customer = Customer.objects.create_user(email=email, password=None)
+    customer.password = profile.password
+    customer.save()
     
     # Cleanup
     profile.delete()
     
+    logger.info(f"Business Event: Successful signup for {email}")
     return customer
