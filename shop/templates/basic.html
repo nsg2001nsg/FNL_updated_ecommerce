@@ -328,8 +328,7 @@
 {% for message in messages %}
 <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
     <strong>Message: </strong>{{ message }}
-    <button class="close" type="button" data-dismiss="alert" aria-label="Close">
-    <span aria-hidden="true">&times;</span></button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 </div>
 {% endfor %}
 <div id="js-messages-container"></div>
@@ -407,7 +406,7 @@ const popover = new bootstrap.Popover('.popover-dismiss', {
 function showMessage(msg, tags) {
     const container = document.getElementById('js-messages-container');
     if (!container) return;
-    const alertHtml = '<div class="alert alert-' + tags + ' alert-dismissible fade show" role="alert"><strong>Message: </strong>' + msg + '<button class="close" type="button" data-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove()"><span aria-hidden="true">&times;</span></button></div>';
+    const alertHtml = '<div class="alert alert-' + tags + ' alert-dismissible fade show" role="alert"><strong>Message: </strong>' + msg + '<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close" onclick="this.parentElement.remove()"></button></div>';
     container.innerHTML += alertHtml;
 }
 
