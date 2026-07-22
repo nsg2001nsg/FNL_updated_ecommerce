@@ -6,6 +6,7 @@ from django.utils import timezone
 from datetime import timedelta
 from .models import Profile, Customer
 import logging
+import requests
 
 logger = logging.getLogger(__name__)
 
@@ -20,28 +21,31 @@ class CustomerCreationError(Exception):
 
 def send_otp_email(email, otp):
     """
-    Sends the OTP email to the user. Isolated to easily replace with Celery later.
+    Sends the OTP email to the user via Brevo HTTP API to bypass cloud SMTP blocks.
     """
     subject = "Welcome to Shop - F&L login!"
     message = f"Hello!\n{otp} is your OTP to login to F&L\n-F&L"
-    logger.info("Calling send_mail()")
+    logger.info("Calling Brevo HTTP API for send_otp_email()")
+    
+    url = "https://api.brevo.com/v3/smtp/email"
+    headers = {
+        "accept": "application/json",
+        "api-key": settings.BREVO_API_KEY,
+        "content-type": "application/json"
+    }
+    payload = {
+        "sender": {"name": "F&L Shop", "email": settings.DEFAULT_FROM_EMAIL},
+        "to": [{"email": email}],
+        "subject": subject,
+        "textContent": message
+    }
+    
     try:
-        logger.info(f"EMAIL_HOST={settings.EMAIL_HOST}")
-        logger.info(f"EMAIL_PORT={settings.EMAIL_PORT}")
-        logger.info(f"EMAIL_USE_TLS={settings.EMAIL_USE_TLS}")
-        logger.info(f"EMAIL_USE_SSL={getattr(settings, 'EMAIL_USE_SSL', False)}")
-        logger.info(f"EMAIL_HOST_USER={settings.EMAIL_HOST_USER}")
-        logger.info(f"DEFAULT_FROM_EMAIL={settings.DEFAULT_FROM_EMAIL}")
-        send_mail(
-            subject=subject,
-            message=message,
-            from_email=settings.DEFAULT_FROM_EMAIL,
-            recipient_list=[email],
-            fail_silently=False
-        )
-        logger.info("Email successfully sent")
+        response = requests.post(url, json=payload, headers=headers, timeout=settings.EMAIL_TIMEOUT)
+        response.raise_for_status()
+        logger.info("Email successfully sent via Brevo HTTP API")
     except Exception as e:
-        logger.exception("send_mail failed")
+        logger.exception(f"Brevo API failed. HTTP Status Code: {getattr(e.response, 'status_code', 'N/A') if hasattr(e, 'response') else 'N/A'}")
         raise CustomerCreationError("Failed to send OTP email. Please try again later.")
 
 

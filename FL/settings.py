@@ -26,9 +26,11 @@ env = environ.Env(
 environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 EMAIL_USE_TLS = env('EMAIL_USE_TLS', cast=bool, default=True)
+EMAIL_USE_SSL = env('EMAIL_USE_SSL', cast=bool, default=False)
 EMAIL_HOST = env('EMAIL_HOST', default='')
 EMAIL_HOST_USER = env('EMAIL_HOST_USER', default='')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='')
+BREVO_API_KEY = env('BREVO_API_KEY', default=EMAIL_HOST_PASSWORD)
 EMAIL_PORT = env('EMAIL_PORT', cast=int, default=587)
 EMAIL_TIMEOUT = 10  # Prevents server hang if SMTP is unresponsive
 
