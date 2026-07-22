@@ -9,11 +9,14 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+
 class OTPVerificationFailed(Exception):
     pass
 
+
 class CustomerCreationError(Exception):
     pass
+
 
 def send_otp_email(email, otp):
     """
@@ -32,7 +35,7 @@ def send_otp_email(email, otp):
         send_mail(
             subject=subject,
             message=message,
-            from_email=settings.EMAIL_HOST_USER,
+            from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[email],
             fail_silently=False
         )
@@ -40,6 +43,7 @@ def send_otp_email(email, otp):
     except Exception as e:
         logger.exception("send_mail failed")
         raise CustomerCreationError("Failed to send OTP email. Please try again later.")
+
 
 def generate_and_send_otp(email, password):
     """
@@ -79,6 +83,7 @@ def generate_and_send_otp(email, password):
     send_otp_email(email, otp)
     
     return profile
+
 
 def verify_otp_and_create_customer(email, submitted_otp):
     """
